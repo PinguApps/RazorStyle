@@ -99,7 +99,7 @@ public static class RazorStyleCliRunner
             CultureInfo.InvariantCulture,
             $"{path}({diagnostic.Line},{diagnostic.Column}): warning {diagnostic.Id}: {diagnostic.Message}");
 
-        AnsiConsole.MarkupLine(CultureInfo.InvariantCulture, "[yellow]{0}[/]", Markup.Escape(message));
+        Console.Out.WriteLine(message);
     }
 }
 
