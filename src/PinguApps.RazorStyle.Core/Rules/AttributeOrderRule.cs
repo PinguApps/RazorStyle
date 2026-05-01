@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace PinguApps.RazorStyle.Core.Rules;
 
 /// <summary>
@@ -9,8 +11,6 @@ public sealed class AttributeOrderRule : IRazorStyleRule
     /// The rule identifier.
     /// </summary>
     public const string DiagnosticId = "RS0003";
-
-    private readonly AttributeWrappingFixer _fixer = new();
 
     /// <inheritdoc />
     string IRazorStyleRule.DiagnosticId => DiagnosticId;
@@ -45,11 +45,7 @@ public sealed class AttributeOrderRule : IRazorStyleRule
                 continue;
             }
 
-            TagInfo reorderedTag = tag with
-            {
-                Attributes = orderedAttributes,
-            };
-            string replacementText = _fixer.Format(reorderedTag, newLine);
+            string replacementText = FormatWithExistingLayout(document.Text, tag, orderedAttributes);
             string currentText = document.Text[tag.StartIndex..(tag.EndIndex + 1)];
 
             if (!string.Equals(currentText, replacementText, StringComparison.Ordinal))
@@ -59,6 +55,25 @@ public sealed class AttributeOrderRule : IRazorStyleRule
         }
 
         return new RazorStyleRuleResult(diagnostics, replacements);
+    }
+
+    private static string FormatWithExistingLayout(string text, TagInfo tag, IReadOnlyList<AttributeInfo> orderedAttributes)
+    {
+        string tagText = text[tag.StartIndex..(tag.EndIndex + 1)];
+        StringBuilder builder = new(tagText);
+
+        for (int index = tag.Attributes.Count - 1; index >= 0; index--)
+        {
+            AttributeInfo targetSlot = tag.Attributes[index];
+            AttributeInfo orderedAttribute = orderedAttributes[index];
+            int slotStart = targetSlot.StartIndex - tag.StartIndex;
+            int slotLength = targetSlot.EndIndex - targetSlot.StartIndex + 1;
+
+            builder.Remove(slotStart, slotLength);
+            builder.Insert(slotStart, orderedAttribute.RawText);
+        }
+
+        return builder.ToString();
     }
 
     private static IReadOnlyList<AttributeInfo> OrderAttributes(IReadOnlyList<AttributeInfo> attributes)

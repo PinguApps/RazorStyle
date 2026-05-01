@@ -97,6 +97,25 @@ Feature: Razor style rules
       """
 
   @razorstyle
+  Scenario: Child content line rule requires full closing tag name matches
+    Given the Razor source is
+      """
+      <Panel><PanelHeader>
+          Heading
+      </PanelHeader></Panel>
+      """
+    When RazorStyle fix runs
+    Then RazorStyle should report "RS0002"
+    And the rewritten Razor source should be
+      """
+      <Panel>
+          <PanelHeader>
+              Heading
+          </PanelHeader>
+      </Panel>
+      """
+
+  @razorstyle
   Scenario: Attributes are ordered before wrapping
     Given the Razor source is
       """
@@ -111,6 +130,20 @@ Feature: Razor style rules
               @onclick="Save"
               data-track="save"
               disabled />
+      """
+
+  @razorstyle
+  Scenario: Attribute ordering preserves existing wrapping when wrapping is disabled
+    Given the Razor source is
+      """
+      <button class="btn" id="save-button" />
+      """
+    And RazorStyle rule "RS0001" is disabled
+    When RazorStyle fix runs
+    Then RazorStyle should report "RS0003"
+    And the rewritten Razor source should be
+      """
+      <button id="save-button" class="btn" />
       """
 
   @razorstyle

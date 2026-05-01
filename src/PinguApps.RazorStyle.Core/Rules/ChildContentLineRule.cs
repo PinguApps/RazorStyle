@@ -63,12 +63,13 @@ public sealed class ChildContentLineRule : IRazorStyleRule
                 continue;
             }
 
-            string indent = GetLineIndent(document.Text, tag.StartIndex);
+            string indent = GetEffectiveLineIndent(document, tag);
             string childIndent = indent + "    ";
 
             if (contentStartsOnStartTagLine)
             {
                 replacements.Add(new RazorStyleReplacement(tag.EndIndex + 1, firstContentIndex - 1, newLine + childIndent));
+                AddContentIndentReplacements(document.Text, tag.EndIndex + 1, closingTag.StartIndex, childIndent, replacements);
             }
 
             if (closingTagSharesContentLine)
@@ -103,7 +104,7 @@ public sealed class ChildContentLineRule : IRazorStyleRule
                 continue;
             }
 
-            if (StartsWith(text, index, "</" + tag.Name, StringComparison.OrdinalIgnoreCase))
+            if (IsSameNameClosingTag(text, index, tag.Name))
             {
                 int closeEnd = text.IndexOf('>', index + tag.Name.Length + 2);
                 if (closeEnd < 0)
@@ -210,6 +211,17 @@ public sealed class ChildContentLineRule : IRazorStyleRule
         return false;
     }
 
+    private static bool IsSameNameClosingTag(string text, int index, string tagName)
+    {
+        if (!StartsWith(text, index, "</" + tagName, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        int cursor = index + tagName.Length + 2;
+        return cursor >= text.Length || !IsTagNamePart(text[cursor]);
+    }
+
     private static int FindFirstNonWhitespaceIndex(string text, int startIndex, int endIndex)
     {
         for (int index = startIndex; index < endIndex; index++)
@@ -221,6 +233,25 @@ public sealed class ChildContentLineRule : IRazorStyleRule
         }
 
         return startIndex;
+    }
+
+    private static void AddContentIndentReplacements(
+        string text,
+        int startIndex,
+        int endIndex,
+        string indent,
+        List<RazorStyleReplacement> replacements)
+    {
+        for (int index = startIndex; index < endIndex; index++)
+        {
+            if (text[index] != '\n')
+            {
+                continue;
+            }
+
+            int insertionIndex = index + 1;
+            replacements.Add(new RazorStyleReplacement(insertionIndex, insertionIndex - 1, indent));
+        }
     }
 
     private static int FindLastNonWhitespaceIndex(string text, int startIndex, int endIndex)
@@ -248,6 +279,29 @@ public sealed class ChildContentLineRule : IRazorStyleRule
         }
 
         return text[lineStart..cursor];
+    }
+
+    private static string GetEffectiveLineIndent(RazorStyleDocument document, TagInfo tag)
+    {
+        string indent = GetLineIndent(document.Text, tag.StartIndex);
+        LineColumn tagPosition = document.LineMap.GetLineColumn(tag.StartIndex);
+
+        foreach (TagInfo parent in document.Tags.Where(parent => !parent.IsSelfClosing && parent.StartIndex < tag.StartIndex))
+        {
+            ClosingTagInfo? closingTag = FindMatchingClosingTag(document.Text, parent);
+            if (closingTag is null || closingTag.StartIndex <= tag.StartIndex)
+            {
+                continue;
+            }
+
+            LineColumn parentEndPosition = document.LineMap.GetLineColumn(parent.EndIndex);
+            if (parentEndPosition.Line == tagPosition.Line)
+            {
+                indent += "    ";
+            }
+        }
+
+        return indent;
     }
 
     private static bool StartsWith(string text, int index, string value, StringComparison comparison)
