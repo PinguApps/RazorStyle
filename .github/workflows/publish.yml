@@ -1,16 +1,16 @@
 name: Publish NuGet Packages
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - published
 
 permissions:
   contents: read
 
 jobs:
   publish:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -21,17 +21,24 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Resolve package version
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.release.tag_name }}"
+          if ($version.StartsWith("v")) {
+            $version = $version.Substring(1)
+          }
+
+          "PACKAGE_VERSION=$version" >> $env:GITHUB_ENV
+
       - name: Restore
         run: dotnet restore PinguApps.RazorStyle.slnx
 
       - name: Build
         run: dotnet build PinguApps.RazorStyle.slnx -c Release --no-restore
 
-      - name: Test
-        run: dotnet test PinguApps.RazorStyle.slnx -c Release --no-build
-
       - name: Pack
-        run: dotnet pack PinguApps.RazorStyle.slnx -c Release --no-build -o artifacts/packages
+        run: dotnet pack PinguApps.RazorStyle.slnx -c Release --no-build -p:Version=${{ env.PACKAGE_VERSION }} -o artifacts/packages
 
       - name: Publish
         run: dotnet nuget push "artifacts/packages/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

@@ -1,0 +1,85 @@
+name: Run Tests
+
+on:
+  workflow_call:
+    inputs:
+      publish_test_results_comment_mode:
+        required: false
+        type: string
+        default: off
+      publish_test_results_check_name:
+        required: false
+        type: string
+        default: Test Results
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  test:
+    name: Run test suite
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      DOTNET_NOLOGO: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
+        with:
+          global-json-file: global.json
+
+      - name: Restore solution
+        run: dotnet restore PinguApps.RazorStyle.slnx
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          dotnet test PinguApps.RazorStyle.slnx `
+            -c Release `
+            --no-restore `
+            --logger "trx;LogFilePrefix=test-results" `
+            --results-directory TestResults
+
+      - name: Publish test results
+        if: success() || failure()
+        uses: EnricoMi/publish-unit-test-result-action/linux@c950f6fb443cb5af20a377fd0dfaa78838901040 # v2
+        with:
+          files: TestResults/**/*.trx
+          check_name: ${{ inputs.publish_test_results_check_name }}
+          comment_mode: ${{ inputs.publish_test_results_comment_mode }}
+          job_summary: false
+
+      - name: Summarize test results
+        if: always()
+        shell: pwsh
+        run: |
+          $trxFiles = Get-ChildItem -Path TestResults -Filter *.trx -Recurse -ErrorAction SilentlyContinue
+
+          if (-not $trxFiles) {
+            "## Test results`nNo TRX files were produced." >> $env:GITHUB_STEP_SUMMARY
+            exit 0
+          }
+
+          "## Test results" >> $env:GITHUB_STEP_SUMMARY
+
+          foreach ($trxFile in $trxFiles) {
+            [xml]$trx = Get-Content $trxFile.FullName
+            $counters = $trx.TestRun.ResultSummary.Counters
+            "- $($trxFile.Name): passed $($counters.passed), failed $($counters.failed), skipped $($counters.notExecuted), total $($counters.total)" >> $env:GITHUB_STEP_SUMMARY
+          }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: test-results
+          path: TestResults/**/*.trx
+          if-no-files-found: warn
