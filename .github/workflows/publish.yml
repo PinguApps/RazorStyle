@@ -1,0 +1,37 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore PinguApps.RazorStyle.slnx
+
+      - name: Build
+        run: dotnet build PinguApps.RazorStyle.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test PinguApps.RazorStyle.slnx -c Release --no-build
+
+      - name: Pack
+        run: dotnet pack PinguApps.RazorStyle.slnx -c Release --no-build -o artifacts/packages
+
+      - name: Publish
+        run: dotnet nuget push "artifacts/packages/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

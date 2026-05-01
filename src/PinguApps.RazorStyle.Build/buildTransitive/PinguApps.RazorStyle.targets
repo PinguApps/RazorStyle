@@ -1,0 +1,25 @@
+<Project>
+  <PropertyGroup>
+    <RazorStyleCliPath Condition="'$(RazorStyleCliPath)' == ''">$(MSBuildThisFileDirectory)..\tools\net10.0\PinguApps.RazorStyle.Cli.dll</RazorStyleCliPath>
+    <RazorStyleDisabledRuleArguments></RazorStyleDisabledRuleArguments>
+    <RazorStyleDisabledRuleArguments Condition="'$(DisableRS0001)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable RS0001</RazorStyleDisabledRuleArguments>
+    <RazorStyleDisabledRuleArguments Condition="'$(DisableRS0002)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable RS0002</RazorStyleDisabledRuleArguments>
+    <RazorStyleDisabledRuleArguments Condition="'$(DisableRS0003)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable RS0003</RazorStyleDisabledRuleArguments>
+  </PropertyGroup>
+
+  <Target Name="RunRazorStyle"
+          BeforeTargets="CoreCompile"
+          AfterTargets="PreBuildEvent"
+          Condition="
+            '$(RazorStyleEnabled)' == 'true'
+            and Exists('$(RazorStyleCliPath)')">
+    <ItemGroup>
+      <RazorStyleFiles Include="$(MSBuildProjectDirectory)\**\*.razor"
+                       Exclude="$(MSBuildProjectDirectory)\bin\**\*;$(MSBuildProjectDirectory)\obj\**\*" />
+    </ItemGroup>
+
+    <Exec Command="dotnet &quot;$(RazorStyleCliPath)&quot; $(RazorStyleCommand) &quot;$(MSBuildProjectDirectory)&quot;$(RazorStyleDisabledRuleArguments)"
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          Condition="'@(RazorStyleFiles)' != ''" />
+  </Target>
+</Project>
