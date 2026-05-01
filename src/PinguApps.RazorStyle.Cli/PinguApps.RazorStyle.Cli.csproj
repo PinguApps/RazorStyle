@@ -5,7 +5,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>razorstyle</ToolCommandName>
     <PackageId>PinguApps.RazorStyle.Cli</PackageId>
-    <Description>Command-line formatter and linter for Razor start-tag style.</Description>
+    <Description>Command-line formatter and linter for Razor.</Description>
   </PropertyGroup>
 
   <ItemGroup>

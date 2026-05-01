@@ -18,4 +18,3 @@ public interface IRazorStyleRule
     /// </summary>
     public RazorStyleRuleResult Evaluate(RazorStyleDocument document, bool applyFixes, string newLine);
 }
-
