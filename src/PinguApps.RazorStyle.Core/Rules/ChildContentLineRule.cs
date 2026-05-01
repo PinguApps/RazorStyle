@@ -121,13 +121,93 @@ public sealed class ChildContentLineRule : IRazorStyleRule
                 continue;
             }
 
-            if (StartsWith(text, index, "<" + tag.Name, StringComparison.OrdinalIgnoreCase))
+            if (TryReadSameNameStartTag(text, index, tag.Name, out int startTagEnd, out bool isSelfClosing))
             {
-                depth++;
+                if (!isSelfClosing)
+                {
+                    depth++;
+                }
+
+                index = startTagEnd;
             }
         }
 
         return null;
+    }
+
+    private static bool TryReadSameNameStartTag(
+        string text,
+        int index,
+        string tagName,
+        out int tagEnd,
+        out bool isSelfClosing)
+    {
+        tagEnd = -1;
+        isSelfClosing = false;
+
+        if (!StartsWith(text, index, "<" + tagName, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        int cursor = index + tagName.Length + 1;
+        if (cursor < text.Length && IsTagNamePart(text[cursor]))
+        {
+            return false;
+        }
+
+        char? quote = null;
+        int parenthesisDepth = 0;
+
+        for (; cursor < text.Length; cursor++)
+        {
+            char current = text[cursor];
+
+            if (quote is not null)
+            {
+                if (current == quote)
+                {
+                    quote = null;
+                }
+
+                continue;
+            }
+
+            if (current is '"' or '\'')
+            {
+                quote = current;
+                continue;
+            }
+
+            if (current == '(')
+            {
+                parenthesisDepth++;
+                continue;
+            }
+
+            if (current == ')' && parenthesisDepth > 0)
+            {
+                parenthesisDepth--;
+                continue;
+            }
+
+            if (parenthesisDepth != 0 || current != '>')
+            {
+                continue;
+            }
+
+            tagEnd = cursor;
+            int previous = cursor - 1;
+            while (previous > index && char.IsWhiteSpace(text[previous]))
+            {
+                previous--;
+            }
+
+            isSelfClosing = text[previous] == '/';
+            return true;
+        }
+
+        return false;
     }
 
     private static int FindFirstNonWhitespaceIndex(string text, int startIndex, int endIndex)
@@ -174,6 +254,11 @@ public sealed class ChildContentLineRule : IRazorStyleRule
     {
         return index + value.Length <= text.Length &&
             string.Compare(text, index, value, 0, value.Length, comparison) == 0;
+    }
+
+    private static bool IsTagNamePart(char value)
+    {
+        return char.IsLetterOrDigit(value) || value is '_' or '-' or '.' or ':';
     }
 
 }

@@ -82,6 +82,21 @@ Feature: Razor style rules
     Then no RazorStyle diagnostics should be reported
 
   @razorstyle
+  Scenario: Child content line rule handles self closing child tags with the same name
+    Given the Razor source is
+      """
+      <Panel><Panel /></Panel>
+      """
+    When RazorStyle fix runs
+    Then RazorStyle should report "RS0002"
+    And the rewritten Razor source should be
+      """
+      <Panel>
+          <Panel />
+      </Panel>
+      """
+
+  @razorstyle
   Scenario: Attributes are ordered before wrapping
     Given the Razor source is
       """
