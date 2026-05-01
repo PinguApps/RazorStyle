@@ -104,6 +104,20 @@ public sealed class ChildContentLineRule : IRazorStyleRule
                 continue;
             }
 
+            if (TryReadStartTag(text, index, out string? childTagName, out int childTagEnd, out _) &&
+                childTagName is not null &&
+                IsRawTextTag(childTagName))
+            {
+                int rawTextClosingTagEnd = FindRawTextClosingTagEnd(text, childTagName, childTagEnd);
+                if (rawTextClosingTagEnd < 0)
+                {
+                    return null;
+                }
+
+                index = rawTextClosingTagEnd;
+                continue;
+            }
+
             if (IsSameNameClosingTag(text, index, tag.Name))
             {
                 int closeEnd = text.IndexOf('>', index + tag.Name.Length + 2);
@@ -143,20 +157,34 @@ public sealed class ChildContentLineRule : IRazorStyleRule
         out int tagEnd,
         out bool isSelfClosing)
     {
+        return TryReadStartTag(text, index, out string? actualTagName, out tagEnd, out isSelfClosing) &&
+            string.Equals(actualTagName, tagName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool TryReadStartTag(
+        string text,
+        int index,
+        out string? tagName,
+        out int tagEnd,
+        out bool isSelfClosing)
+    {
+        tagName = null;
         tagEnd = -1;
         isSelfClosing = false;
 
-        if (!StartsWith(text, index, "<" + tagName, StringComparison.OrdinalIgnoreCase))
+        if (index + 1 >= text.Length || text[index] != '<' || !IsTagNameStart(text[index + 1]))
         {
             return false;
         }
 
-        int cursor = index + tagName.Length + 1;
-        if (cursor < text.Length && IsTagNamePart(text[cursor]))
+        int nameStart = index + 1;
+        int cursor = nameStart + 1;
+        while (cursor < text.Length && IsTagNamePart(text[cursor]))
         {
-            return false;
+            cursor++;
         }
 
+        tagName = text[nameStart..cursor];
         char? quote = null;
         int parenthesisDepth = 0;
 
@@ -209,6 +237,29 @@ public sealed class ChildContentLineRule : IRazorStyleRule
         }
 
         return false;
+    }
+
+    private static int FindRawTextClosingTagEnd(string text, string tagName, int startIndex)
+    {
+        int index = startIndex;
+
+        while (index < text.Length)
+        {
+            int closingTagIndex = text.IndexOf("</" + tagName, index, StringComparison.OrdinalIgnoreCase);
+            if (closingTagIndex < 0)
+            {
+                return -1;
+            }
+
+            if (IsSameNameClosingTag(text, closingTagIndex, tagName))
+            {
+                return text.IndexOf('>', closingTagIndex + tagName.Length + 2);
+            }
+
+            index = closingTagIndex + 2;
+        }
+
+        return -1;
     }
 
     private static bool IsSameNameClosingTag(string text, int index, string tagName)
@@ -313,6 +364,17 @@ public sealed class ChildContentLineRule : IRazorStyleRule
     private static bool IsTagNamePart(char value)
     {
         return char.IsLetterOrDigit(value) || value is '_' or '-' or '.' or ':';
+    }
+
+    private static bool IsTagNameStart(char value)
+    {
+        return char.IsLetter(value) || value == '_';
+    }
+
+    private static bool IsRawTextTag(string tagName)
+    {
+        return string.Equals(tagName, "script", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(tagName, "style", StringComparison.OrdinalIgnoreCase);
     }
 
 }

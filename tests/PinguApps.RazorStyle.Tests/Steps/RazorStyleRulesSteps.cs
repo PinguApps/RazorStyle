@@ -64,6 +64,14 @@ public sealed class RazorStyleRulesSteps
         Assert.Equal(expectedAttributes.Replace("\\\"", "\"", StringComparison.Ordinal), actualAttributes);
     }
 
+    [Then("tag {int} should be named {string}")]
+    public void ThenTagShouldBeNamed(int tagNumber, string expectedName)
+    {
+        TagInfo tag = _tags[tagNumber - 1];
+
+        Assert.Equal(expectedName, tag.Name);
+    }
+
     [Then("no RazorStyle diagnostics should be reported")]
     public void ThenNoRazorStyleDiagnosticsShouldBeReported()
     {

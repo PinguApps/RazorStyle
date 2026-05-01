@@ -18,6 +18,20 @@ Feature: Razor style rules
     And tag 6 should have attributes "disabled"
 
   @razorstyle
+  Scenario: Raw text scanning requires full closing tag name matches
+    Given the Razor source is
+      """
+      <script>
+          const value = "</scripture><Foo Param=\"Bar\" />";
+      </script>
+      <Bar />
+      """
+    When the Razor tags are scanned
+    Then 2 Razor start tags should be found
+    And tag 1 should be named "script"
+    And tag 2 should be named "Bar"
+
+  @razorstyle
   Scenario: Attribute wrapping accepts valid markup
     Given the Razor source is
       """
@@ -113,6 +127,25 @@ Feature: Razor style rules
               Heading
           </PanelHeader>
       </Panel>
+      """
+
+  @razorstyle
+  Scenario: Child content line rule ignores closing tag text inside raw text children
+    Given the Razor source is
+      """
+      <div><script>
+          const value = "</div>";
+      </script></div>
+      """
+    When RazorStyle fix runs
+    Then RazorStyle should report "RS0002"
+    And the rewritten Razor source should be
+      """
+      <div>
+          <script>
+              const value = "</div>";
+          </script>
+      </div>
       """
 
   @razorstyle

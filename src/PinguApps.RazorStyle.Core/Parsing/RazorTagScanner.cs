@@ -48,12 +48,8 @@ public sealed class RazorTagScanner
 
             if (IsRawTextTag(tag.Name))
             {
-                int closingTagIndex = text.IndexOf(
-                    "</" + tag.Name,
-                    tag.EndIndex,
-                    StringComparison.OrdinalIgnoreCase);
-
-                index = closingTagIndex < 0 ? tag.EndIndex : closingTagIndex - 1;
+                int closingTagEndIndex = FindRawTextClosingTagEnd(text, tag.Name, tag.EndIndex);
+                index = closingTagEndIndex < 0 ? tag.EndIndex : closingTagEndIndex;
             }
             else
             {
@@ -250,6 +246,40 @@ public sealed class RazorTagScanner
     {
         return string.Equals(tagName, "script", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(tagName, "style", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static int FindRawTextClosingTagEnd(string text, string tagName, int startIndex)
+    {
+        int index = startIndex;
+
+        while (index < text.Length)
+        {
+            int closingTagIndex = text.IndexOf("</" + tagName, index, StringComparison.OrdinalIgnoreCase);
+            if (closingTagIndex < 0)
+            {
+                return -1;
+            }
+
+            if (IsSameNameClosingTag(text, closingTagIndex, tagName))
+            {
+                return text.IndexOf('>', closingTagIndex + tagName.Length + 2);
+            }
+
+            index = closingTagIndex + 2;
+        }
+
+        return -1;
+    }
+
+    private static bool IsSameNameClosingTag(string text, int index, string tagName)
+    {
+        if (!StartsWith(text, index, "</" + tagName, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        int cursor = index + tagName.Length + 2;
+        return cursor >= text.Length || !IsTagNamePart(text[cursor]);
     }
 
     private static bool StartsWith(string text, int index, string value, StringComparison comparison)
