@@ -14,7 +14,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: harupy/auto-labeling@master
+      - uses: harupy/auto-labeling@937d558e37285af6ca5c5813a826cf6f0d66bf0f # master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           label-pattern: '- \[(.*?)\] ?`(.+?)`' # matches '- [x] `label`'
