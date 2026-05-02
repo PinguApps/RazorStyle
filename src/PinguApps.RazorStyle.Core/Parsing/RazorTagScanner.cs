@@ -257,6 +257,11 @@ public sealed class RazorTagScanner
     {
         blockEnd = -1;
 
+        if (index + 1 < text.Length && text[index + 1] == '{')
+        {
+            return TryReadBalancedBlockEnd(text, index + 1, out blockEnd);
+        }
+
         string? keyword = StartsWithRazorKeyword(text, index, "code")
             ? "code"
             : StartsWithRazorKeyword(text, index, "functions") ? "functions" : null;

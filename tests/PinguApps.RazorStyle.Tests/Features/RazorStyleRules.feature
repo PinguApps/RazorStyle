@@ -43,6 +43,17 @@ Feature: Razor style rules
     Then 0 Razor start tags should be found
 
   @razorstyle
+  Scenario: Razor tags are not scanned inside inline code blocks
+    Given the Razor source is
+      """
+      @{
+          var markup = "<span>Hi</span>";
+      }
+      """
+    When the Razor tags are scanned
+    Then 0 Razor start tags should be found
+
+  @razorstyle
   Scenario: Attribute wrapping accepts valid markup
     Given the Razor source is
       """
@@ -171,6 +182,21 @@ Feature: Razor style rules
       """
       <div>
           @("</div>")
+      </div>
+      """
+
+  @razorstyle
+  Scenario: Child content line rule ignores closing tag text inside inline code blocks
+    Given the Razor source is
+      """
+      <div>@{ var text = "</div>"; }</div>
+      """
+    When RazorStyle fix runs
+    Then RazorStyle should report "RS0002"
+    And the rewritten Razor source should be
+      """
+      <div>
+          @{ var text = "</div>"; }
       </div>
       """
 

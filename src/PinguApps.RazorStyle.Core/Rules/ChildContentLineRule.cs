@@ -87,7 +87,7 @@ public sealed class ChildContentLineRule : IRazorStyleRule
 
         for (int index = tag.EndIndex + 1; index < text.Length; index++)
         {
-            if (text[index] == '@' && TryReadRazorExplicitExpressionEnd(text, index, out int expressionEnd))
+            if (text[index] == '@' && TryReadRazorBlockOrExpressionEnd(text, index, out int expressionEnd))
             {
                 index = expressionEnd;
                 continue;
@@ -268,11 +268,11 @@ public sealed class ChildContentLineRule : IRazorStyleRule
         return -1;
     }
 
-    private static bool TryReadRazorExplicitExpressionEnd(string text, int index, out int expressionEnd)
+    private static bool TryReadRazorBlockOrExpressionEnd(string text, int index, out int expressionEnd)
     {
         expressionEnd = -1;
 
-        if (index + 1 >= text.Length || text[index] != '@' || text[index + 1] != '(')
+        if (index + 1 >= text.Length || text[index] != '@' || text[index + 1] is not ('(' or '{'))
         {
             return false;
         }
@@ -280,6 +280,8 @@ public sealed class ChildContentLineRule : IRazorStyleRule
         int depth = 0;
         char? quote = null;
         bool escaped = false;
+        char open = text[index + 1];
+        char close = open == '(' ? ')' : '}';
 
         for (int cursor = index + 1; cursor < text.Length; cursor++)
         {
@@ -313,13 +315,13 @@ public sealed class ChildContentLineRule : IRazorStyleRule
                 continue;
             }
 
-            if (current == '(')
+            if (current == open)
             {
                 depth++;
                 continue;
             }
 
-            if (current == ')')
+            if (current == close)
             {
                 depth--;
                 if (depth == 0)
