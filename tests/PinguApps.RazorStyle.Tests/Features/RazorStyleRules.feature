@@ -106,6 +106,22 @@ Feature: Razor style rules
       """
 
   @razorstyle
+  Scenario: Child content line rule preserves already separate closing tag indentation
+    Given the Razor source is
+      """
+      <div>Hello
+      </div>
+      """
+    When RazorStyle fix runs
+    Then RazorStyle should report "RS0002"
+    And the rewritten Razor source should be
+      """
+      <div>
+          Hello
+      </div>
+      """
+
+  @razorstyle
   Scenario: Self closing tags satisfy child content rule
     Given the Razor source is
       """
@@ -197,6 +213,21 @@ Feature: Razor style rules
       """
       <div>
           @{ var text = "</div>"; }
+      </div>
+      """
+
+  @razorstyle
+  Scenario: Child content line rule ignores closing tag text inside implicit Razor expressions
+    Given the Razor source is
+      """
+      <div>@Format("</div>")</div>
+      """
+    When RazorStyle fix runs
+    Then RazorStyle should report "RS0002"
+    And the rewritten Razor source should be
+      """
+      <div>
+          @Format("</div>")
       </div>
       """
 

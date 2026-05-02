@@ -272,18 +272,47 @@ public sealed class ChildContentLineRule : IRazorStyleRule
     {
         expressionEnd = -1;
 
-        if (index + 1 >= text.Length || text[index] != '@' || text[index + 1] is not ('(' or '{'))
+        if (index + 1 >= text.Length || text[index] != '@')
         {
             return false;
         }
 
+        if (text[index + 1] is '(' or '{')
+        {
+            char open = text[index + 1];
+            char close = open == '(' ? ')' : '}';
+            return TryReadBalancedRegionEnd(text, index + 1, open, close, out expressionEnd);
+        }
+
+        if (!IsTagNameStart(text[index + 1]))
+        {
+            return false;
+        }
+
+        int cursor = index + 2;
+        while (cursor < text.Length && (IsTagNamePart(text[cursor]) || text[cursor] == '.'))
+        {
+            cursor++;
+        }
+
+        return cursor < text.Length &&
+            text[cursor] == '(' &&
+            TryReadBalancedRegionEnd(text, cursor, '(', ')', out expressionEnd);
+    }
+
+    private static bool TryReadBalancedRegionEnd(
+        string text,
+        int startIndex,
+        char open,
+        char close,
+        out int expressionEnd)
+    {
+        expressionEnd = -1;
         int depth = 0;
         char? quote = null;
         bool escaped = false;
-        char open = text[index + 1];
-        char close = open == '(' ? ')' : '}';
 
-        for (int cursor = index + 1; cursor < text.Length; cursor++)
+        for (int cursor = startIndex; cursor < text.Length; cursor++)
         {
             char current = text[cursor];
 
@@ -374,6 +403,11 @@ public sealed class ChildContentLineRule : IRazorStyleRule
             }
 
             int insertionIndex = index + 1;
+            if (FindFirstNonWhitespaceIndex(text, insertionIndex, endIndex) >= endIndex)
+            {
+                continue;
+            }
+
             replacements.Add(new RazorStyleReplacement(insertionIndex, insertionIndex - 1, indent));
         }
     }
