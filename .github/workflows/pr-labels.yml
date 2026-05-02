@@ -1,0 +1,20 @@
+name: Auto Labeller
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+
+jobs:
+  labelling:
+    name: Labelling
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: harupy/auto-labeling@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          label-pattern: '- \[(.*?)\] ?`(.+?)`' # matches '- [x] `label`'

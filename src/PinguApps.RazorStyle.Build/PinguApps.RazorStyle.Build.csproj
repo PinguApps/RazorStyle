@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>PinguApps.RazorStyle</PackageId>
+    <Description>MSBuild integration for RazorStyle formatting and linting.</Description>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <TargetsForTfmSpecificContentInPackage>
+      $(TargetsForTfmSpecificContentInPackage);IncludeRazorStyleCliInPackage
+    </TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="buildTransitive\PinguApps.RazorStyle.props"
+          Pack="true"
+          PackagePath="buildTransitive\" />
+    <None Include="buildTransitive\PinguApps.RazorStyle.targets"
+          Pack="true"
+          PackagePath="buildTransitive\" />
+    <None Include="..\..\README.md"
+          Pack="true"
+          PackagePath="\" />
+  </ItemGroup>
+
+  <Target Name="BuildEmbeddedRazorStyleCli" Condition="'$(NoBuild)' != 'true'">
+    <MSBuild Projects="..\PinguApps.RazorStyle.Cli\PinguApps.RazorStyle.Cli.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)" />
+  </Target>
+
+  <Target Name="IncludeRazorStyleCliInPackage" DependsOnTargets="BuildEmbeddedRazorStyleCli">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="..\PinguApps.RazorStyle.Cli\bin\$(Configuration)\$(TargetFramework)\**\*"
+                              Exclude="..\PinguApps.RazorStyle.Cli\bin\$(Configuration)\$(TargetFramework)\publish\**\*"
+                              PackagePath="tools\$(TargetFramework)\" />
+    </ItemGroup>
+  </Target>
+
+</Project>

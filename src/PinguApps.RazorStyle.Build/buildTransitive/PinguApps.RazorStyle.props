@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <RazorStyleEnabled Condition="'$(RazorStyleEnabled)' == ''">true</RazorStyleEnabled>
+    <RazorStyleCommand Condition="'$(RazorStyleCommand)' == '' and '$(ContinuousIntegrationBuild)' == 'true'">check</RazorStyleCommand>
+    <RazorStyleCommand Condition="'$(RazorStyleCommand)' == ''">fix</RazorStyleCommand>
+    <DisableRS0001 Condition="'$(DisableRS0001)' == ''">false</DisableRS0001>
+    <DisableRS0002 Condition="'$(DisableRS0002)' == ''">false</DisableRS0002>
+    <DisableRS0003 Condition="'$(DisableRS0003)' == ''">false</DisableRS0003>
+  </PropertyGroup>
+</Project>

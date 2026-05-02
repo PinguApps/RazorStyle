@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PinguApps.RazorStyle.Core\PinguApps.RazorStyle.Core.csproj" />
+  </ItemGroup>
+
+</Project>

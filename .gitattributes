@@ -1,0 +1,47 @@
+# Normalize all detected text files in the repository to LF in Git and in working trees.
+* text=auto eol=lf
+
+# Binary assets. Disable text diff/newline conversion.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.bmp binary
+*.tif binary
+*.tiff binary
+*.pdf binary
+*.zip binary
+*.7z binary
+*.gz binary
+*.tgz binary
+*.bz2 binary
+*.rar binary
+*.nupkg binary
+*.snupkg binary
+*.dll binary
+*.exe binary
+*.so binary
+*.dylib binary
+*.a binary
+*.lib binary
+*.pdb binary
+*.snk binary
+*.pfx binary
+*.p12 binary
+*.cer binary
+*.crt binary
+*.der binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+*.mp3 binary
+*.wav binary
+*.ogg binary
+*.mp4 binary
+*.mov binary
+*.avi binary
+*.webm binary

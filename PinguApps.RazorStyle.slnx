@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/repo/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PinguApps.RazorStyle.Build/PinguApps.RazorStyle.Build.csproj" />
+    <Project Path="src/PinguApps.RazorStyle.Cli/PinguApps.RazorStyle.Cli.csproj" />
+    <Project Path="src/PinguApps.RazorStyle.Core/PinguApps.RazorStyle.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PinguApps.RazorStyle.Tests/PinguApps.RazorStyle.Tests.csproj" />
+  </Folder>
+</Solution>
