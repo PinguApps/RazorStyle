@@ -32,6 +32,17 @@ Feature: Razor style rules
     And tag 2 should be named "Bar"
 
   @razorstyle
+  Scenario: Razor tags are not scanned inside code blocks
+    Given the Razor source is
+      """
+      @code {
+          private const string Markup = "<span>Some</span>";
+      }
+      """
+    When the Razor tags are scanned
+    Then 0 Razor start tags should be found
+
+  @razorstyle
   Scenario: Attribute wrapping accepts valid markup
     Given the Razor source is
       """
@@ -145,6 +156,21 @@ Feature: Razor style rules
           <script>
               const value = "</div>";
           </script>
+      </div>
+      """
+
+  @razorstyle
+  Scenario: Child content line rule ignores closing tag text inside quoted Razor expressions
+    Given the Razor source is
+      """
+      <div>@("</div>")</div>
+      """
+    When RazorStyle fix runs
+    Then RazorStyle should report "RS0002"
+    And the rewritten Razor source should be
+      """
+      <div>
+          @("</div>")
       </div>
       """
 

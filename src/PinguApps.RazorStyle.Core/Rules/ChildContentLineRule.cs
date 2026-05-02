@@ -87,6 +87,12 @@ public sealed class ChildContentLineRule : IRazorStyleRule
 
         for (int index = tag.EndIndex + 1; index < text.Length; index++)
         {
+            if (text[index] == '@' && TryReadRazorExplicitExpressionEnd(text, index, out int expressionEnd))
+            {
+                index = expressionEnd;
+                continue;
+            }
+
             if (text[index] != '<')
             {
                 continue;
@@ -260,6 +266,71 @@ public sealed class ChildContentLineRule : IRazorStyleRule
         }
 
         return -1;
+    }
+
+    private static bool TryReadRazorExplicitExpressionEnd(string text, int index, out int expressionEnd)
+    {
+        expressionEnd = -1;
+
+        if (index + 1 >= text.Length || text[index] != '@' || text[index + 1] != '(')
+        {
+            return false;
+        }
+
+        int depth = 0;
+        char? quote = null;
+        bool escaped = false;
+
+        for (int cursor = index + 1; cursor < text.Length; cursor++)
+        {
+            char current = text[cursor];
+
+            if (quote is not null)
+            {
+                if (escaped)
+                {
+                    escaped = false;
+                    continue;
+                }
+
+                if (current == '\\')
+                {
+                    escaped = true;
+                    continue;
+                }
+
+                if (current == quote)
+                {
+                    quote = null;
+                }
+
+                continue;
+            }
+
+            if (current is '"' or '\'')
+            {
+                quote = current;
+                continue;
+            }
+
+            if (current == '(')
+            {
+                depth++;
+                continue;
+            }
+
+            if (current == ')')
+            {
+                depth--;
+                if (depth == 0)
+                {
+                    expressionEnd = cursor;
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static bool IsSameNameClosingTag(string text, int index, string tagName)

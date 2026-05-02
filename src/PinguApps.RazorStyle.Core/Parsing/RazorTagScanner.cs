@@ -17,6 +17,27 @@ public sealed class RazorTagScanner
 
         for (int index = 0; index < text.Length; index++)
         {
+            if (text[index] == '@')
+            {
+                if (StartsWith(text, index, "@*", StringComparison.Ordinal))
+                {
+                    int commentEnd = text.IndexOf("*@", index + 2, StringComparison.Ordinal);
+                    if (commentEnd < 0)
+                    {
+                        break;
+                    }
+
+                    index = commentEnd + 1;
+                    continue;
+                }
+
+                if (TryReadCodeBlockEnd(text, index, out int codeBlockEnd))
+                {
+                    index = codeBlockEnd;
+                    continue;
+                }
+            }
+
             if (text[index] != '<')
             {
                 continue;
@@ -230,6 +251,96 @@ public sealed class RazorTagScanner
         }
 
         return index;
+    }
+
+    private static bool TryReadCodeBlockEnd(string text, int index, out int blockEnd)
+    {
+        blockEnd = -1;
+
+        string? keyword = StartsWithRazorKeyword(text, index, "code")
+            ? "code"
+            : StartsWithRazorKeyword(text, index, "functions") ? "functions" : null;
+
+        if (keyword is null)
+        {
+            return false;
+        }
+
+        int cursor = SkipWhitespace(text, index + keyword.Length + 1);
+        return cursor < text.Length &&
+            text[cursor] == '{' &&
+            TryReadBalancedBlockEnd(text, cursor, out blockEnd);
+    }
+
+    private static bool TryReadBalancedBlockEnd(string text, int openBraceIndex, out int blockEnd)
+    {
+        blockEnd = -1;
+        int depth = 0;
+        char? quote = null;
+        bool escaped = false;
+
+        for (int cursor = openBraceIndex; cursor < text.Length; cursor++)
+        {
+            char current = text[cursor];
+
+            if (quote is not null)
+            {
+                if (escaped)
+                {
+                    escaped = false;
+                    continue;
+                }
+
+                if (current == '\\')
+                {
+                    escaped = true;
+                    continue;
+                }
+
+                if (current == quote)
+                {
+                    quote = null;
+                }
+
+                continue;
+            }
+
+            if (current is '"' or '\'')
+            {
+                quote = current;
+                continue;
+            }
+
+            if (current == '{')
+            {
+                depth++;
+                continue;
+            }
+
+            if (current == '}')
+            {
+                depth--;
+                if (depth == 0)
+                {
+                    blockEnd = cursor;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool StartsWithRazorKeyword(string text, int index, string keyword)
+    {
+        int keywordStart = index + 1;
+        int keywordEnd = keywordStart + keyword.Length;
+        return index >= 0 &&
+            index < text.Length &&
+            text[index] == '@' &&
+            keywordEnd <= text.Length &&
+            string.Compare(text, keywordStart, keyword, 0, keyword.Length, StringComparison.Ordinal) == 0 &&
+            (keywordEnd >= text.Length || !IsTagNamePart(text[keywordEnd]));
     }
 
     private static bool IsTagNameStart(char value)
