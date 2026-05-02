@@ -15,3 +15,7 @@
 - Broaden CI detection [build] (impact: low)
   - Why: Azure DevOps should set CI mode through `TF_BUILD`, with reasonable support for other common CI hosts.
   - Change: `ContinuousIntegrationBuild` now auto-enables for GitHub Actions, Azure DevOps, generic `CI=true`, TeamCity, and Jenkins unless explicitly set; README documents the behaviour. (files: Directory.Build.props, README.md | cmds: `dotnet msbuild ... -getProperty:ContinuousIntegrationBuild`, `dotnet build PinguApps.RazorStyle.slnx --no-restore`, `git diff --check`)
+### 2026-05-02 11:09 +01:00 (feature/docs-refresh)
+- Reformat badges [docs] (impact: low)
+  - Why: User requested README badges grouped by package type with version/download rows.
+  - Change: Replaced inline badges under the README title with a Markdown table headed `CLI Tool` and `Build Package`. (files: README.md | cmds: `git diff --check -- README.md`)

@@ -1,7 +1,9 @@
 # RazorStyle
 
-[![PinguApps.RazorStyle.Cli version](https://img.shields.io/nuget/v/PinguApps.RazorStyle.Cli?style=for-the-badge&label=PinguApps.RazorStyle.Cli)](https://www.nuget.org/packages/PinguApps.RazorStyle.Cli/) [![PinguApps.RazorStyle.Cli downloads](https://img.shields.io/nuget/dt/PinguApps.RazorStyle.Cli?style=for-the-badge&label=CLI%20downloads)](https://www.nuget.org/packages/PinguApps.RazorStyle.Cli/)
-[![PinguApps.RazorStyle version](https://img.shields.io/nuget/v/PinguApps.RazorStyle?style=for-the-badge&label=PinguApps.RazorStyle)](https://www.nuget.org/packages/PinguApps.RazorStyle/) [![PinguApps.RazorStyle downloads](https://img.shields.io/nuget/dt/PinguApps.RazorStyle?style=for-the-badge&label=build%20package%20downloads)](https://www.nuget.org/packages/PinguApps.RazorStyle/)
+| | CLI Tool | Build Package |
+| --- | --- | --- |
+| Version | [![PinguApps.RazorStyle.Cli version](https://img.shields.io/nuget/v/PinguApps.RazorStyle.Cli?style=for-the-badge&label=PinguApps.RazorStyle.Cli)](https://www.nuget.org/packages/PinguApps.RazorStyle.Cli/) | [![PinguApps.RazorStyle version](https://img.shields.io/nuget/v/PinguApps.RazorStyle?style=for-the-badge&label=PinguApps.RazorStyle)](https://www.nuget.org/packages/PinguApps.RazorStyle/) |
+| Downloads | [![PinguApps.RazorStyle.Cli downloads](https://img.shields.io/nuget/dt/PinguApps.RazorStyle.Cli?style=for-the-badge&label=CLI%20downloads)](https://www.nuget.org/packages/PinguApps.RazorStyle.Cli/) | [![PinguApps.RazorStyle downloads](https://img.shields.io/nuget/dt/PinguApps.RazorStyle?style=for-the-badge&label=build%20package%20downloads)](https://www.nuget.org/packages/PinguApps.RazorStyle/) |
 
 RazorStyle is an opinionated formatter and linter for Blazor `.razor` files. It exists to make component markup predictable across a codebase by enforcing a small set of layout and attribute-ordering rules that are easy to check in CI and easy to fix locally. The style is deliberately prescriptive: it favours consistency, readable diffs, and low-friction code review over preserving every author's preferred Razor layout.
 
