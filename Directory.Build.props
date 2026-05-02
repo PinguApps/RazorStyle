@@ -17,7 +17,15 @@
     <RepositoryType>git</RepositoryType>
     <Configurations>Debug;Release</Configurations>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <ContinuousIntegrationBuild Condition="
+      '$(ContinuousIntegrationBuild)' == ''
+      and (
+        '$(GITHUB_ACTIONS)' == 'true'
+        or '$(TF_BUILD)' == 'true'
+        or '$(CI)' == 'true'
+        or '$(TEAMCITY_VERSION)' != ''
+        or '$(JENKINS_URL)' != ''
+      )">true</ContinuousIntegrationBuild>
     <Authors>PinguApps</Authors>
     <Company>PinguApps</Company>
     <Copyright>Copyright (c) PinguApps</Copyright>
