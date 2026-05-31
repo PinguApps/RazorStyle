@@ -13,9 +13,9 @@ RazorStyle is an opinionated formatter and linter for Blazor `.razor` files. It 
 - [Build Integration](#build-integration)
 - [CLI Usage](#cli-usage)
 - [Rules](#rules)
-  - [RS0001 Attribute Wrapping](#rs0001-attribute-wrapping)
-  - [RS0002 Child Content Lines](#rs0002-child-content-lines)
-  - [RS0003 Attribute Order](#rs0003-attribute-order)
+  - [PARS0001 Attribute Wrapping](#pars0001-attribute-wrapping)
+  - [PARS0002 Child Content Lines](#pars0002-child-content-lines)
+  - [PARS0003 Attribute Order](#pars0003-attribute-order)
 
 ## Packages
 
@@ -45,9 +45,9 @@ Override behaviour with MSBuild properties:
 <PropertyGroup>
   <RazorStyleEnabled>true</RazorStyleEnabled>
   <RazorStyleCommand>check</RazorStyleCommand>
-  <DisableRS0001>false</DisableRS0001>
-  <DisableRS0002>false</DisableRS0002>
-  <DisableRS0003>false</DisableRS0003>
+  <DisablePARS0001>false</DisablePARS0001>
+  <DisablePARS0002>false</DisablePARS0002>
+  <DisablePARS0003>false</DisablePARS0003>
 </PropertyGroup>
 ```
 
@@ -78,20 +78,20 @@ razorstyle fix .\src
 Disable specific rules for a run:
 
 ```powershell
-razorstyle check .\src --disable RS0001 --disable RS0003
+razorstyle check .\src --disable PARS0001 --disable PARS0003
 ```
 
 Use the CLI when you want direct control over when RazorStyle runs. It is a good fit for local cleanup, manual checks before opening a PR, custom CI steps, and scripts that should target a particular folder.
 
 ## Rules
 
-- `RS0001`: start-tag attributes must wrap and align consistently.
-- `RS0002`: child content must appear on its own line.
-- `RS0003`: attributes must follow the preferred RazorStyle order.
+- `PARS0001`: start-tag attributes must wrap and align consistently.
+- `PARS0002`: child content must appear on its own line.
+- `PARS0003`: attributes must follow the preferred RazorStyle order.
 
-### RS0001 Attribute Wrapping
+### PARS0001 Attribute Wrapping
 
-`RS0001` keeps multi-attribute start tags readable by putting each additional attribute on its own aligned line. Tags with no attributes, or with a single attribute, stay inline so simple markup remains compact.
+`PARS0001` keeps multi-attribute start tags readable by putting each additional attribute on its own aligned line. Tags with no attributes, or with a single attribute, stay inline so simple markup remains compact.
 
 Before:
 
@@ -114,9 +114,9 @@ Single-attribute and attribute-free tags remain inline:
 <Modal Title="Hello" />
 ```
 
-### RS0002 Child Content Lines
+### PARS0002 Child Content Lines
 
-`RS0002` separates child content from the opening and closing tags. This makes inline element bodies easier to scan, gives nested markup room to breathe, and avoids small edits turning into noisy one-line diffs.
+`PARS0002` separates child content from the opening and closing tags. This makes inline element bodies easier to scan, gives nested markup room to breathe, and avoids small edits turning into noisy one-line diffs.
 
 Before:
 
@@ -139,9 +139,9 @@ Self-closing tags are already valid:
 <span class="foo" />
 ```
 
-### RS0003 Attribute Order
+### PARS0003 Attribute Order
 
-`RS0003` applies a stable attribute order so the important identity, styling, binding, event, content, accessibility, and fallback attributes appear in a predictable place. In broad terms, unique identity-style attributes such as `@key`, `@ref`, `name`, and `id` come first, followed by `class` and `style`, binding and value-related attributes, event callbacks, common HTML/component attributes, templated or child-content attributes, general attributes, `aria-*`, `data-*`, splatted `@attributes`, and boolean or conditional attributes near the end.
+`PARS0003` applies a stable attribute order so the important identity, styling, binding, event, content, accessibility, and fallback attributes appear in a predictable place. In broad terms, unique identity-style attributes such as `@key`, `@ref`, `name`, and `id` come first, followed by `class` and `style`, binding and value-related attributes, event callbacks, common HTML/component attributes, templated or child-content attributes, general attributes, `aria-*`, `data-*`, splatted `@attributes`, and boolean or conditional attributes near the end.
 
 Before:
 

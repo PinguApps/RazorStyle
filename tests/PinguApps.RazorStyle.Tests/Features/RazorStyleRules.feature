@@ -72,7 +72,7 @@ Feature: Razor style rules
       <Foo Param="Bar" Param2="Baz" />
       """
     When RazorStyle check runs
-    Then RazorStyle should report "RS0001"
+    Then RazorStyle should report "PARS0001"
     And RazorStyle should report "Each attribute after the first must begin on a new line."
 
   @razorstyle
@@ -97,7 +97,7 @@ Feature: Razor style rules
       <span>Some text</span>
       """
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0002"
+    Then RazorStyle should report "PARS0002"
     And the rewritten Razor source should be
       """
       <span>
@@ -113,7 +113,7 @@ Feature: Razor style rules
       </div>
       """
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0002"
+    Then RazorStyle should report "PARS0002"
     And the rewritten Razor source should be
       """
       <div>
@@ -140,7 +140,7 @@ Feature: Razor style rules
       <Panel><Panel /></Panel>
       """
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0002"
+    Then RazorStyle should report "PARS0002"
     And the rewritten Razor source should be
       """
       <Panel>
@@ -157,7 +157,7 @@ Feature: Razor style rules
       </PanelHeader></Panel>
       """
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0002"
+    Then RazorStyle should report "PARS0002"
     And the rewritten Razor source should be
       """
       <Panel>
@@ -176,7 +176,7 @@ Feature: Razor style rules
       </script></div>
       """
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0002"
+    Then RazorStyle should report "PARS0002"
     And the rewritten Razor source should be
       """
       <div>
@@ -193,7 +193,7 @@ Feature: Razor style rules
       <div>@("</div>")</div>
       """
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0002"
+    Then RazorStyle should report "PARS0002"
     And the rewritten Razor source should be
       """
       <div>
@@ -208,7 +208,7 @@ Feature: Razor style rules
       <div>@{ var text = "</div>"; }</div>
       """
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0002"
+    Then RazorStyle should report "PARS0002"
     And the rewritten Razor source should be
       """
       <div>
@@ -223,7 +223,7 @@ Feature: Razor style rules
       <div>@Format("</div>")</div>
       """
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0002"
+    Then RazorStyle should report "PARS0002"
     And the rewritten Razor source should be
       """
       <div>
@@ -238,7 +238,7 @@ Feature: Razor style rules
       <button data-track="save" disabled class="btn" @onclick="Save" id="save-button" />
       """
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0003"
+    Then RazorStyle should report "PARS0003"
     And the rewritten Razor source should be
       """
       <button id="save-button"
@@ -254,9 +254,9 @@ Feature: Razor style rules
       """
       <button class="btn" id="save-button" />
       """
-    And RazorStyle rule "RS0001" is disabled
+    And RazorStyle rule "PARS0001" is disabled
     When RazorStyle fix runs
-    Then RazorStyle should report "RS0003"
+    Then RazorStyle should report "PARS0003"
     And the rewritten Razor source should be
       """
       <button id="save-button" class="btn" />
@@ -297,7 +297,7 @@ Feature: Razor style rules
       """
       <Foo Param="Bar" Param2="Baz" />
       """
-    And RazorStyle rule "RS0001" is disabled
+    And RazorStyle rule "PARS0001" is disabled
     When RazorStyle check runs
     Then no RazorStyle diagnostics should be reported
     When RazorStyle fix runs

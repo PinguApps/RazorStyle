@@ -8,7 +8,7 @@ public sealed class ChildContentLineRule : IRazorStyleRule
     /// <summary>
     /// The rule identifier.
     /// </summary>
-    public const string DiagnosticId = "RS0002";
+    public const string DiagnosticId = "PARS0002";
 
     /// <inheritdoc />
     string IRazorStyleRule.DiagnosticId => DiagnosticId;

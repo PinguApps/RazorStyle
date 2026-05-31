@@ -8,7 +8,7 @@ public sealed class AttributeWrappingRule : IRazorStyleRule
     /// <summary>
     /// The rule identifier.
     /// </summary>
-    public const string DiagnosticId = "RS0001";
+    public const string DiagnosticId = "PARS0001";
 
     private readonly AttributeWrappingFixer _fixer = new();
 
