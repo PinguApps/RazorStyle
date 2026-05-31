@@ -10,7 +10,7 @@ public sealed class AttributeOrderRule : IRazorStyleRule
     /// <summary>
     /// The rule identifier.
     /// </summary>
-    public const string DiagnosticId = "RS0003";
+    public const string DiagnosticId = "PARS0003";
 
     /// <inheritdoc />
     string IRazorStyleRule.DiagnosticId => DiagnosticId;

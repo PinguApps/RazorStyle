@@ -3,8 +3,8 @@
     <RazorStyleEnabled Condition="'$(RazorStyleEnabled)' == ''">true</RazorStyleEnabled>
     <RazorStyleCommand Condition="'$(RazorStyleCommand)' == '' and '$(ContinuousIntegrationBuild)' == 'true'">check</RazorStyleCommand>
     <RazorStyleCommand Condition="'$(RazorStyleCommand)' == ''">fix</RazorStyleCommand>
-    <DisableRS0001 Condition="'$(DisableRS0001)' == ''">false</DisableRS0001>
-    <DisableRS0002 Condition="'$(DisableRS0002)' == ''">false</DisableRS0002>
-    <DisableRS0003 Condition="'$(DisableRS0003)' == ''">false</DisableRS0003>
+    <DisablePARS0001 Condition="'$(DisablePARS0001)' == ''">false</DisablePARS0001>
+    <DisablePARS0002 Condition="'$(DisablePARS0002)' == ''">false</DisablePARS0002>
+    <DisablePARS0003 Condition="'$(DisablePARS0003)' == ''">false</DisablePARS0003>
   </PropertyGroup>
 </Project>

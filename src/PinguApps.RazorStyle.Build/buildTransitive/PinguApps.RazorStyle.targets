@@ -2,9 +2,9 @@
   <PropertyGroup>
     <RazorStyleCliPath Condition="'$(RazorStyleCliPath)' == ''">$(MSBuildThisFileDirectory)..\tools\net10.0\PinguApps.RazorStyle.Cli.dll</RazorStyleCliPath>
     <RazorStyleDisabledRuleArguments></RazorStyleDisabledRuleArguments>
-    <RazorStyleDisabledRuleArguments Condition="'$(DisableRS0001)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable RS0001</RazorStyleDisabledRuleArguments>
-    <RazorStyleDisabledRuleArguments Condition="'$(DisableRS0002)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable RS0002</RazorStyleDisabledRuleArguments>
-    <RazorStyleDisabledRuleArguments Condition="'$(DisableRS0003)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable RS0003</RazorStyleDisabledRuleArguments>
+    <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0001)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0001</RazorStyleDisabledRuleArguments>
+    <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0002)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0002</RazorStyleDisabledRuleArguments>
+    <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0003)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0003</RazorStyleDisabledRuleArguments>
   </PropertyGroup>
 
   <Target Name="RunRazorStyle"
