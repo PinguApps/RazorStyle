@@ -1,0 +1,5 @@
+interface:
+  display_name: "Test Changes"
+  short_description: "Manually verify the work just completed"
+policy:
+  allow_implicit_invocation: false

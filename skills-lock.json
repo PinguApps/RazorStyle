@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "finish-pr": {
+      "source": "pinguapps/skills",
+      "sourceType": "github",
+      "skillPath": "skills/finish-pr/SKILL.md",
+      "computedHash": "1d345aa4432d4f2994a428e958ef11a5fb25ac0f847897acfbf077c1bc53f4c7"
+    },
+    "implement-task-linear": {
+      "source": "pinguapps/skills",
+      "sourceType": "github",
+      "skillPath": "skills/implement-task-linear/SKILL.md",
+      "computedHash": "5da7d95f96b28f961b2a0ce4484e6d1f0ae9ca0230a66bf1d5aa193de8abf3af"
+    },
+    "test-changes": {
+      "source": "pinguapps/skills",
+      "sourceType": "github",
+      "skillPath": "skills/test-changes/SKILL.md",
+      "computedHash": "ae2b10b64b37c72f447e8fb35f8275a842093fe21c891ee1702fefccb63e79af"
+    },
+    "to-linear": {
+      "source": "pinguapps/skills",
+      "sourceType": "github",
+      "skillPath": "skills/to-linear/SKILL.md",
+      "computedHash": "0a849baa9fa3e2d65dbd204ee6a722a49f8e4a95c75d6dc6916ae50c2f746e69"
+    }
+  }
+}

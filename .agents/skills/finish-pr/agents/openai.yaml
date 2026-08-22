@@ -1,0 +1,4 @@
+interface:
+  display_name: "Finish PR"
+  short_description: "Finish current PR through Gitar review"
+  default_prompt: "Use $finish-pr to resolve conflicts, failed CI, and all review feedback on the current PR, then continue until Gitar Core reports a clean current-HEAD review."
