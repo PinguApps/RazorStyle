@@ -21,7 +21,7 @@ permissions:
 jobs:
   test:
     name: Run test suite
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     env:
       CI: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
