@@ -1,0 +1,16 @@
+## Rolling state
+- Goal: Mirror Aspire.Hosting.Upstash.Redis commit dafedf4, publishing release drafts weekly when main advances.
+- Current plan: Complete PR #41 review cycle; leave open for merge.
+- Open questions/risks: Workflow was not dispatched because that would publish the live `v2.0.1` release and NuGet packages.
+- Next actions: Merge PR #41 when ready.
+- Key paths: `.github/workflows/publish-release-draft.yml`, `.github/workflows/publish.yml`
+
+## Session log
+### 2026-09-28 14:27 +01:00 (agent/weekly-publish-draft)
+- Add weekly release draft publisher [build] (impact: med)
+  - Why: Mirror upstream commit dafedf4 for RazorStyle releases.
+  - Change: Copied upstream scheduled/manual workflow and made package publishing reusable with safe tag passing (files: `.github/workflows/publish-release-draft.yml`, `.github/workflows/publish.yml` | commit: `01460a1`).
+  - Notes: Restore, build, 20 tests, pack, and actionlint passed; actionlint ignored the repo's existing Blacksmith runner label.
+- Open PR #41 and address review [build] (impact: low)
+  - Change: Linked PR #41, confirmed CI and Gitar approval, and explained why the PR Agent's proposed draft-tag ancestry check would block the current tagless draft.
+  - Notes: PR Agent accepted the explanation and resolved its thread; no workflow dispatch was run.
