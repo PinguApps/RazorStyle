@@ -1,0 +1,69 @@
+name: Publish Release Draft
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 9 * * 0' # Sunday 09:17 UTC
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-release-draft
+  cancel-in-progress: false
+
+jobs:
+  publish_draft:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    outputs:
+      tag: ${{ steps.publish.outputs.tag }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Publish draft if main has new commits
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          releases=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --paginate | jq -s 'add')
+          latest_tag=$(jq -r '[.[] | select(.draft == false)] | max_by(.published_at) | .tag_name // empty' <<< "$releases")
+          if [[ -z "$latest_tag" ]]; then
+            echo "No published release to compare against"
+            exit 0
+          fi
+
+          if ! git merge-base --is-ancestor "$latest_tag" HEAD; then
+            echo "Latest release tag $latest_tag is not on main" >&2
+            exit 1
+          fi
+
+          if [[ $(git rev-list --count "$latest_tag..HEAD") -eq 0 ]]; then
+            echo "No commits on main since $latest_tag"
+            exit 0
+          fi
+
+          draft=$(jq -r '[.[] | select(.draft)] | if length == 0 then empty else max_by(.created_at) | [.id, .tag_name] | @tsv end' <<< "$releases")
+          if [[ -z "$draft" ]]; then
+            echo "No release draft available"
+            exit 0
+          fi
+
+          IFS=$'\t' read -r draft_id draft_tag <<< "$draft"
+          gh api --method PATCH "repos/$GITHUB_REPOSITORY/releases/$draft_id" \
+            -F draft=false --jq .html_url
+          echo "tag=$draft_tag" >> "$GITHUB_OUTPUT"
+
+  publish_packages:
+    needs: publish_draft
+    if: needs.publish_draft.outputs.tag != ''
+    permissions:
+      contents: read
+    uses: ./.github/workflows/publish.yml
+    with:
+      tag: ${{ needs.publish_draft.outputs.tag }}
+    secrets: inherit
