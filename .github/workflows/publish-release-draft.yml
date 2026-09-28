@@ -3,7 +3,7 @@ name: Publish Release Draft
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 9 * * 0' # Sunday 09:17 UTC
+    - cron: '02 9 * * 0' # Sunday 09:02 UTC
 
 permissions:
   contents: write
