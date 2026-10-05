@@ -1,39 +1,51 @@
 name-template: "v$RESOLVED_VERSION"
 tag-template: "v$RESOLVED_VERSION"
 tag-prefix: "v"
-version-resolver:
-  major:
-    labels:
-      - major
-  minor:
-    labels:
-      - minor
-  patch:
-    labels:
-      - patch
-  default: patch
 categories:
   - title: "🔒 Security"
-    labels:
-      - "security"
+    when:
+      labels:
+        - "security"
   - title: "🚀 Features"
-    labels:
-      - "feature"
-      - "enhancement"
+    when:
+      labels:
+        - "feature"
+        - "enhancement"
   - title: "🐛 Bug Fixes"
-    labels:
-      - "bug"
-      - "fix"
+    when:
+      labels:
+        - "bug"
+        - "fix"
   - title: "📄 Documentation"
-    labels:
-      - "docs"
-      - "documentation"
+    when:
+      labels:
+        - "docs"
+        - "documentation"
   - title: "🔗 Dependencies"
-    labels:
-      - "dependencies"
+    when:
+      labels:
+        - "dependencies"
   - title: "🌀 Meta"
-    labels:
-      - "meta"
+    when:
+      labels:
+        - "meta"
+  - type: "version-resolver"
+    semver-increment: "major"
+    when:
+      labels:
+        - major
+  - type: "version-resolver"
+    semver-increment: "minor"
+    when:
+      labels:
+        - minor
+  - type: "version-resolver"
+    semver-increment: "patch"
+    when:
+      labels:
+        - patch
+  - type: "version-resolver"
+    semver-increment: "patch"
 change-template: "- [#$NUMBER] $TITLE - Thanks to @$AUTHOR!"
 change-title-escapes: '\<*_&'
 template: |
