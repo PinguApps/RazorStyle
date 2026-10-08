@@ -5,6 +5,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>razorstyle</ToolCommandName>
     <PackageId>PinguApps.RazorStyle.Cli</PackageId>
+    <PackageIcon>icon.png</PackageIcon>
     <Description>Command-line formatter and linter for Razor.</Description>
   </PropertyGroup>
 
@@ -21,4 +22,7 @@
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>
