@@ -8,9 +8,8 @@ namespace PinguApps.RazorStyle.Cli.Commands;
 public sealed class FixCommand : Command<RazorStyleCommandSettings>
 {
     /// <inheritdoc />
-    protected override int Execute(CommandContext context, RazorStyleCommandSettings settings, CancellationToken cancellationToken)
+    public override int Execute(CommandContext context, RazorStyleCommandSettings settings, CancellationToken cancellationToken)
     {
         return RazorStyleCliRunner.Run("fix", settings);
     }
 }
-
