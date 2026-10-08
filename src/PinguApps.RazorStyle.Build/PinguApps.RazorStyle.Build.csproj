@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <PackageId>PinguApps.RazorStyle</PackageId>
+    <PackageIcon>icon.png</PackageIcon>
     <Description>MSBuild integration for RazorStyle formatting and linting.</Description>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
@@ -37,4 +38,7 @@
     </ItemGroup>
   </Target>
 
+  <ItemGroup>
+    <None Update="icon.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>
