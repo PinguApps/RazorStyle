@@ -20,5 +20,15 @@ public sealed class RazorStyleCommandSettings : CommandSettings
     [CommandOption("--disable <RULE_ID>")]
     [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Spectre.Console.Cli binds repeatable option values to arrays.")]
     public string[] DisabledRules { get; init; } = [];
+
+    /// <summary>
+    /// Gets whether attributes keep their position relative to an <c>@attributes</c> directive.
+    /// </summary>
+    [CommandOption("--preserve-attribute-splatting-order")]
+    public bool PreserveAttributeSplattingOrder
+    {
+        get;
+        init;
+    }
 }
 

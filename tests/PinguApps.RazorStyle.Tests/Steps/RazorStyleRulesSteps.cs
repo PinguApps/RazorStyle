@@ -8,6 +8,7 @@ public sealed class RazorStyleRulesSteps
 {
     private readonly RazorStyleRunner _runner = new();
     private readonly List<string> _disabledRuleIds = [];
+    private bool _preserveAttributeSplattingOrder;
     private string? _source;
     private IReadOnlyList<TagInfo> _tags = [];
     private RazorStyleFileResult? _result;
@@ -17,6 +18,7 @@ public sealed class RazorStyleRulesSteps
     {
         _source = source;
         _disabledRuleIds.Clear();
+        _preserveAttributeSplattingOrder = false;
     }
 
     [Given("RazorStyle rule {string} is disabled")]
@@ -24,6 +26,17 @@ public sealed class RazorStyleRulesSteps
     {
         _disabledRuleIds.Add(ruleId);
     }
+
+    [Given("attribute splatting order is preserved")]
+    public void GivenAttributeSplattingOrderIsPreserved()
+    {
+        _preserveAttributeSplattingOrder = true;
+    }
+
+    private RazorStyleOptions CreateOptions() => new(_disabledRuleIds)
+    {
+        PreserveAttributeSplattingOrder = _preserveAttributeSplattingOrder,
+    };
 
     [When("the Razor tags are scanned")]
     public void WhenTheRazorTagsAreScanned()
@@ -38,7 +51,7 @@ public sealed class RazorStyleRulesSteps
     {
         Assert.NotNull(_source);
 
-        _result = _runner.CheckText(_source, "Test.razor", new RazorStyleOptions(_disabledRuleIds));
+        _result = _runner.CheckText(_source, "Test.razor", CreateOptions());
     }
 
     [When("RazorStyle fix runs")]
@@ -46,7 +59,7 @@ public sealed class RazorStyleRulesSteps
     {
         Assert.NotNull(_source);
 
-        _result = _runner.FixText(_source, "Test.razor", new RazorStyleOptions(_disabledRuleIds));
+        _result = _runner.FixText(_source, "Test.razor", CreateOptions());
     }
 
     [Then("{int} Razor start tags should be found")]
@@ -85,7 +98,7 @@ public sealed class RazorStyleRulesSteps
     {
         Assert.NotNull(_result?.RewrittenText);
 
-        RazorStyleOptions options = new(_disabledRuleIds);
+        RazorStyleOptions options = CreateOptions();
         Assert.Empty(_runner.CheckText(_result.RewrittenText, "Test.razor", options).Diagnostics);
         Assert.Null(_runner.FixText(_result.RewrittenText, "Test.razor", options).RewrittenText);
     }

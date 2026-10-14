@@ -17,7 +17,10 @@ public static class RazorStyleCliRunner
         ArgumentException.ThrowIfNullOrWhiteSpace(command);
         ArgumentNullException.ThrowIfNull(settings);
 
-        RazorStyleOptions options = new(settings.DisabledRules);
+        RazorStyleOptions options = new(settings.DisabledRules)
+        {
+            PreserveAttributeSplattingOrder = settings.PreserveAttributeSplattingOrder,
+        };
         RazorStyleRunner runner = new();
 
         try

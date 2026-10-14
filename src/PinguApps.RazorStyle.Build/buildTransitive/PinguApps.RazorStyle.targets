@@ -5,6 +5,8 @@
     <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0001)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0001</RazorStyleDisabledRuleArguments>
     <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0002)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0002</RazorStyleDisabledRuleArguments>
     <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0003)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0003</RazorStyleDisabledRuleArguments>
+    <RazorStyleAttributeOrderArguments></RazorStyleAttributeOrderArguments>
+    <RazorStyleAttributeOrderArguments Condition="'$(RazorStylePreserveAttributeSplattingOrder)' == 'true'"> --preserve-attribute-splatting-order</RazorStyleAttributeOrderArguments>
   </PropertyGroup>
 
   <Target Name="RunRazorStyle"
@@ -18,7 +20,7 @@
                        Exclude="$(MSBuildProjectDirectory)\bin\**\*;$(MSBuildProjectDirectory)\obj\**\*" />
     </ItemGroup>
 
-    <Exec Command="dotnet &quot;$(RazorStyleCliPath)&quot; $(RazorStyleCommand) &quot;$(MSBuildProjectDirectory)&quot;$(RazorStyleDisabledRuleArguments)"
+    <Exec Command="dotnet &quot;$(RazorStyleCliPath)&quot; $(RazorStyleCommand) &quot;$(MSBuildProjectDirectory)&quot;$(RazorStyleDisabledRuleArguments)$(RazorStyleAttributeOrderArguments)"
           WorkingDirectory="$(MSBuildProjectDirectory)"
           Condition="'@(RazorStyleFiles)' != ''" />
   </Target>

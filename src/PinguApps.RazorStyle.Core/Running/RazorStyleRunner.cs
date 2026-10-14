@@ -7,9 +7,9 @@ namespace PinguApps.RazorStyle.Core.Running;
 /// </summary>
 public sealed class RazorStyleRunner
 {
-    private readonly IReadOnlyList<IRazorStyleRule> _rules =
+    private static IReadOnlyList<IRazorStyleRule> CreateRules(RazorStyleOptions options) =>
     [
-        new AttributeOrderRule(),
+        new AttributeOrderRule { PreserveAttributeSplattingOrder = options.PreserveAttributeSplattingOrder },
         new AttributeWrappingRule(),
         new ChildContentLineRule(),
     ];
@@ -35,7 +35,7 @@ public sealed class RazorStyleRunner
         List<RazorDiagnostic> diagnostics = [];
         string newLine = DetectNewLine(text);
 
-        foreach (IRazorStyleRule rule in _rules.Where(rule => options.IsRuleEnabled(rule.DiagnosticId)))
+        foreach (IRazorStyleRule rule in CreateRules(options).Where(rule => options.IsRuleEnabled(rule.DiagnosticId)))
         {
             diagnostics.AddRange(rule.Evaluate(document, applyFixes: false, newLine).Diagnostics);
         }
@@ -64,7 +64,7 @@ public sealed class RazorStyleRunner
         string newLine = DetectNewLine(text);
         string currentText = text;
 
-        foreach (IRazorStyleRule rule in _rules.Where(rule => options.IsRuleEnabled(rule.DiagnosticId)))
+        foreach (IRazorStyleRule rule in CreateRules(options).Where(rule => options.IsRuleEnabled(rule.DiagnosticId)))
         {
             RazorStyleDocument document = new(currentText, filePath);
             RazorStyleRuleResult result = rule.Evaluate(document, applyFixes: true, newLine);
