@@ -48,6 +48,7 @@ Override behaviour with MSBuild properties:
   <DisablePARS0001>false</DisablePARS0001>
   <DisablePARS0002>false</DisablePARS0002>
   <DisablePARS0003>false</DisablePARS0003>
+  <RazorStylePreserveAttributeSplattingOrder>false</RazorStylePreserveAttributeSplattingOrder>
 </PropertyGroup>
 ```
 
@@ -79,6 +80,13 @@ Disable specific rules for a run:
 
 ```powershell
 razorstyle check .\src --disable PARS0001 --disable PARS0003
+```
+
+Opt into preserving attribute precedence around `@attributes` for either command:
+
+```powershell
+razorstyle fix .\src --preserve-attribute-splatting-order
+razorstyle check .\src --preserve-attribute-splatting-order
 ```
 
 Use the CLI when you want direct control over when RazorStyle runs. It is a good fit for local cleanup, manual checks before opening a PR, custom CI steps, and scripts that should target a particular folder.
@@ -158,3 +166,25 @@ After:
         data-track="save"
         disabled />
 ```
+
+Attribute splatting order is preserved only when you opt in. Set this property in your `.csproj` or `Directory.Build.props`:
+
+```xml
+<PropertyGroup>
+  <RazorStylePreserveAttributeSplattingOrder>true</RazorStylePreserveAttributeSplattingOrder>
+</PropertyGroup>
+```
+
+With this option enabled, `@attributes` stays in its existing position. The same ordering rule sorts each group of attributes before and after it independently, without moving any attribute across it. This preserves which explicit attributes override values in the splatted dictionary. Both `check` and `fix` use this behaviour, and attribute wrapping still applies.
+
+For example, ignoring wrapping:
+
+```razor
+<!-- Before -->
+<div title="Hello" @attributes="Extras" class="card" id="item" />
+
+<!-- After -->
+<div title="Hello" @attributes="Extras" id="item" class="card" />
+```
+
+The property defaults to `false`, retaining the global ordering described above. `DisablePARS0003=true` still disables attribute ordering entirely, even when this option is enabled.

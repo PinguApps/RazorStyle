@@ -263,6 +263,90 @@ Feature: Razor style rules
       """
 
   @razorstyle
+  Scenario: Attribute splatting keeps the existing global ordering by default
+    Given the Razor source is
+      """
+      <div title="Hello" @attributes="Extras" class="card" id="item" />
+      """
+    And RazorStyle rule "PARS0001" is disabled
+    When RazorStyle fix runs
+    Then RazorStyle should report "PARS0003"
+    And the rewritten Razor source should be
+      """
+      <div id="item" class="card" title="Hello" @attributes="Extras" />
+      """
+    And the rewritten source should pass check and remain unchanged by another fix
+
+  @razorstyle
+  Scenario Outline: Opting in preserves the splatting boundary while sorting each group
+    Given the Razor source is
+      """
+      <div <Attributes> />
+      """
+    And attribute splatting order is preserved
+    And RazorStyle rule "PARS0001" is disabled
+    When RazorStyle check runs
+    Then RazorStyle should report "PARS0003"
+    When RazorStyle fix runs
+    Then the rewritten Razor source should be
+      """
+      <div <Ordered attributes> />
+      """
+    And the rewritten source should pass check and remain unchanged by another fix
+
+    Examples:
+      | Attributes                                                         | Ordered attributes                                                 |
+      | title="Hello" @attributes="Extras" class="card" id="item"          | title="Hello" @attributes="Extras" id="item" class="card"          |
+      | class="card" id="item" @attributes="Extras" disabled title="Hello" | id="item" class="card" @attributes="Extras" title="Hello" disabled |
+      | @attributes="Extras" class="card" id="item"                        | @attributes="Extras" id="item" class="card"                        |
+      | disabled class="card" id="item" @attributes="Extras"               | id="item" class="card" disabled @attributes="Extras"               |
+      | class="card" id="item"                                             | id="item" class="card"                                             |
+
+  @razorstyle
+  Scenario: Already ordered groups do not need to match the global attribute order
+    Given the Razor source is
+      """
+      <div title="Hello" @attributes="Extras" id="item" class="card" />
+      """
+    And attribute splatting order is preserved
+    And RazorStyle rule "PARS0001" is disabled
+    When RazorStyle check runs
+    Then no RazorStyle diagnostics should be reported
+    When RazorStyle fix runs
+    Then the Razor source should not be rewritten
+
+  @razorstyle
+  Scenario: Preserving attribute splatting order still allows attribute wrapping
+    Given the Razor source is
+      """
+      <div title="Hello" @attributes="Extras" class="card" id="item" />
+      """
+    And attribute splatting order is preserved
+    When RazorStyle fix runs
+    Then the rewritten Razor source should be
+      """
+      <div title="Hello"
+           @attributes="Extras"
+           id="item"
+           class="card" />
+      """
+    And the rewritten source should pass check and remain unchanged by another fix
+
+  @razorstyle
+  Scenario: Disabling attribute ordering takes priority over preserving splatting order
+    Given the Razor source is
+      """
+      <div title="Hello" @attributes="Extras" class="card" id="item" />
+      """
+    And attribute splatting order is preserved
+    And RazorStyle rule "PARS0001" is disabled
+    And RazorStyle rule "PARS0003" is disabled
+    When RazorStyle check runs
+    Then no RazorStyle diagnostics should be reported
+    When RazorStyle fix runs
+    Then the Razor source should not be rewritten
+
+  @razorstyle
   Scenario: Full file processing preserves unrelated content and line endings
     Given the Razor source is
       """

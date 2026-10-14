@@ -31,6 +31,15 @@ public sealed class RazorStyleOptions
     }
 
     /// <summary>
+    /// Gets whether attribute ordering preserves each attribute's side of an <c>@attributes</c> directive.
+    /// </summary>
+    public bool PreserveAttributeSplattingOrder
+    {
+        get;
+        init;
+    }
+
+    /// <summary>
     /// Returns true when the rule is enabled.
     /// </summary>
     public bool IsRuleEnabled(string ruleId)

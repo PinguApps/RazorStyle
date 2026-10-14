@@ -6,5 +6,6 @@
     <DisablePARS0001 Condition="'$(DisablePARS0001)' == ''">false</DisablePARS0001>
     <DisablePARS0002 Condition="'$(DisablePARS0002)' == ''">false</DisablePARS0002>
     <DisablePARS0003 Condition="'$(DisablePARS0003)' == ''">false</DisablePARS0003>
+    <RazorStylePreserveAttributeSplattingOrder Condition="'$(RazorStylePreserveAttributeSplattingOrder)' == ''">false</RazorStylePreserveAttributeSplattingOrder>
   </PropertyGroup>
 </Project>

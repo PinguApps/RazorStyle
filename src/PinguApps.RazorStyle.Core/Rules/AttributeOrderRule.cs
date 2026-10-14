@@ -15,6 +15,15 @@ public sealed class AttributeOrderRule : IRazorStyleRule
     /// <inheritdoc />
     string IRazorStyleRule.DiagnosticId => DiagnosticId;
 
+    /// <summary>
+    /// Gets whether attributes are ordered independently on each side of an <c>@attributes</c> directive.
+    /// </summary>
+    public bool PreserveAttributeSplattingOrder
+    {
+        get;
+        init;
+    }
+
     /// <inheritdoc />
     public RazorStyleRuleResult Evaluate(RazorStyleDocument document, bool applyFixes, string newLine)
     {
@@ -26,7 +35,9 @@ public sealed class AttributeOrderRule : IRazorStyleRule
 
         foreach (TagInfo tag in document.Tags.Where(tag => tag.Attributes.Count > 1))
         {
-            IReadOnlyList<AttributeInfo> orderedAttributes = OrderAttributes(tag.Attributes);
+            IReadOnlyList<AttributeInfo> orderedAttributes = PreserveAttributeSplattingOrder
+                ? OrderAttributesWithSplattingBoundaries(tag.Attributes)
+                : OrderAttributes(tag.Attributes);
             if (AttributesMatch(tag.Attributes, orderedAttributes))
             {
                 continue;
@@ -76,7 +87,32 @@ public sealed class AttributeOrderRule : IRazorStyleRule
         return builder.ToString();
     }
 
-    private static IReadOnlyList<AttributeInfo> OrderAttributes(IReadOnlyList<AttributeInfo> attributes)
+    private static IReadOnlyList<AttributeInfo> OrderAttributesWithSplattingBoundaries(IReadOnlyList<AttributeInfo> attributes)
+    {
+        List<AttributeInfo> orderedAttributes = [];
+        int groupStart = 0;
+
+        for (int index = 0; index <= attributes.Count; index++)
+        {
+            if (index < attributes.Count && AttributeName.GetName(attributes[index].RawText) != "@attributes")
+            {
+                continue;
+            }
+
+            orderedAttributes.AddRange(OrderAttributes(attributes.Skip(groupStart).Take(index - groupStart)));
+
+            if (index < attributes.Count)
+            {
+                orderedAttributes.Add(attributes[index]);
+            }
+
+            groupStart = index + 1;
+        }
+
+        return orderedAttributes;
+    }
+
+    private static IReadOnlyList<AttributeInfo> OrderAttributes(IEnumerable<AttributeInfo> attributes)
     {
         return attributes
             .Select((attribute, index) => (Attribute: attribute, Index: index, Rank: GetRank(attribute.RawText)))
