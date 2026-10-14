@@ -24,7 +24,7 @@ public sealed class ChildContentLineRule : IRazorStyleRule
 
         foreach (TagInfo tag in document.Tags.Where(tag => !tag.IsSelfClosing))
         {
-            ClosingTagInfo? closingTag = FindMatchingClosingTag(document.Text, tag);
+            ClosingTagInfo? closingTag = FindMatchingClosingTag(document, tag);
             if (closingTag is null)
             {
                 continue;
@@ -81,8 +81,9 @@ public sealed class ChildContentLineRule : IRazorStyleRule
         return new RazorStyleRuleResult(diagnostics, replacements);
     }
 
-    private static ClosingTagInfo? FindMatchingClosingTag(string text, TagInfo tag)
+    private static ClosingTagInfo? FindMatchingClosingTag(RazorStyleDocument document, TagInfo tag)
     {
+        string text = document.Text;
         int depth = 0;
 
         for (int index = tag.EndIndex + 1; index < text.Length; index++)
@@ -110,17 +111,27 @@ public sealed class ChildContentLineRule : IRazorStyleRule
                 continue;
             }
 
-            if (TryReadStartTag(text, index, out string? childTagName, out int childTagEnd, out _) &&
-                childTagName is not null &&
-                IsRawTextTag(childTagName))
+            if (index + 1 < text.Length && IsTagNameStart(text[index + 1]) &&
+                RazorTagScanner.TryParseTag(text, index, document.LineMap, out TagInfo? childTag) && childTag is not null)
             {
-                int rawTextClosingTagEnd = FindRawTextClosingTagEnd(text, childTagName, childTagEnd);
-                if (rawTextClosingTagEnd < 0)
+                if (IsRawTextTag(childTag.Name))
                 {
-                    return null;
+                    int rawTextClosingTagEnd = FindRawTextClosingTagEnd(text, childTag.Name, childTag.EndIndex);
+                    if (rawTextClosingTagEnd < 0)
+                    {
+                        return null;
+                    }
+
+                    index = rawTextClosingTagEnd;
+                    continue;
                 }
 
-                index = rawTextClosingTagEnd;
+                if (!childTag.IsSelfClosing && string.Equals(childTag.Name, tag.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    depth++;
+                }
+
+                index = childTag.EndIndex;
                 continue;
             }
 
@@ -139,110 +150,10 @@ public sealed class ChildContentLineRule : IRazorStyleRule
 
                 depth--;
                 index = closeEnd;
-                continue;
-            }
-
-            if (TryReadSameNameStartTag(text, index, tag.Name, out int startTagEnd, out bool isSelfClosing))
-            {
-                if (!isSelfClosing)
-                {
-                    depth++;
-                }
-
-                index = startTagEnd;
             }
         }
 
         return null;
-    }
-
-    private static bool TryReadSameNameStartTag(
-        string text,
-        int index,
-        string tagName,
-        out int tagEnd,
-        out bool isSelfClosing)
-    {
-        return TryReadStartTag(text, index, out string? actualTagName, out tagEnd, out isSelfClosing) &&
-            string.Equals(actualTagName, tagName, StringComparison.OrdinalIgnoreCase);
-    }
-
-    private static bool TryReadStartTag(
-        string text,
-        int index,
-        out string? tagName,
-        out int tagEnd,
-        out bool isSelfClosing)
-    {
-        tagName = null;
-        tagEnd = -1;
-        isSelfClosing = false;
-
-        if (index + 1 >= text.Length || text[index] != '<' || !IsTagNameStart(text[index + 1]))
-        {
-            return false;
-        }
-
-        int nameStart = index + 1;
-        int cursor = nameStart + 1;
-        while (cursor < text.Length && IsTagNamePart(text[cursor]))
-        {
-            cursor++;
-        }
-
-        tagName = text[nameStart..cursor];
-        char? quote = null;
-        int parenthesisDepth = 0;
-
-        for (; cursor < text.Length; cursor++)
-        {
-            char current = text[cursor];
-
-            if (quote is not null)
-            {
-                if (current == quote)
-                {
-                    quote = null;
-                }
-
-                continue;
-            }
-
-            if (current is '"' or '\'')
-            {
-                quote = current;
-                continue;
-            }
-
-            if (current == '(')
-            {
-                parenthesisDepth++;
-                continue;
-            }
-
-            if (current == ')' && parenthesisDepth > 0)
-            {
-                parenthesisDepth--;
-                continue;
-            }
-
-            if (parenthesisDepth != 0 || current != '>')
-            {
-                continue;
-            }
-
-            tagEnd = cursor;
-            int previous = cursor - 1;
-            while (previous > index && char.IsWhiteSpace(text[previous]))
-            {
-                previous--;
-            }
-
-            isSelfClosing = text[previous] == '/';
-            return true;
-        }
-
-        return false;
     }
 
     private static int FindRawTextClosingTagEnd(string text, string tagName, int startIndex)
@@ -446,7 +357,7 @@ public sealed class ChildContentLineRule : IRazorStyleRule
 
         foreach (TagInfo parent in document.Tags.Where(parent => !parent.IsSelfClosing && parent.StartIndex < tag.StartIndex))
         {
-            ClosingTagInfo? closingTag = FindMatchingClosingTag(document.Text, parent);
+            ClosingTagInfo? closingTag = FindMatchingClosingTag(document, parent);
             if (closingTag is null || closingTag.StartIndex <= tag.StartIndex)
             {
                 continue;

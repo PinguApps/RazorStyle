@@ -88,6 +88,21 @@ Feature: Complex Razor attribute values
     And the rewritten source should pass check and remain unchanged by another fix
 
   @razorstyle
+  Scenario: Nested components with complex attributes still receive child content formatting
+    Given the Razor source is
+      """
+      <Panel><Panel Text="@($"Send ) > to {user}")" /></Panel>
+      """
+    When RazorStyle fix runs
+    Then the rewritten Razor source should be
+      """
+      <Panel>
+          <Panel Text="@($"Send ) > to {user}")" />
+      </Panel>
+      """
+    And the rewritten source should pass check and remain unchanged by another fix
+
+  @razorstyle
   Scenario Outline: Incomplete Razor expressions are not formatted
     Given the Razor source is
       """
