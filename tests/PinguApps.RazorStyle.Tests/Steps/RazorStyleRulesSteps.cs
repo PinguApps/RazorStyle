@@ -72,6 +72,24 @@ public sealed class RazorStyleRulesSteps
         Assert.Equal(expectedName, tag.Name);
     }
 
+    [Then("tag {int} should have these attributes")]
+    public void ThenTagShouldHaveTheseAttributes(int tagNumber, Table expectedAttributes)
+    {
+        Assert.Equal(
+            expectedAttributes.Rows.Select(row => row["Attribute"]),
+            _tags[tagNumber - 1].Attributes.Select(attribute => attribute.RawText));
+    }
+
+    [Then("the rewritten source should pass check and remain unchanged by another fix")]
+    public void ThenTheRewrittenSourceShouldPassCheckAndRemainUnchangedByAnotherFix()
+    {
+        Assert.NotNull(_result?.RewrittenText);
+
+        RazorStyleOptions options = new(_disabledRuleIds);
+        Assert.Empty(_runner.CheckText(_result.RewrittenText, "Test.razor", options).Diagnostics);
+        Assert.Null(_runner.FixText(_result.RewrittenText, "Test.razor", options).RewrittenText);
+    }
+
     [Then("no RazorStyle diagnostics should be reported")]
     public void ThenNoRazorStyleDiagnosticsShouldBeReported()
     {
