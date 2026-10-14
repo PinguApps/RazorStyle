@@ -5,8 +5,7 @@
 - Integration: Installed CLI and build-integration packages (0.1.0-issue10) both preserved and compiled a real Razor component; check and repeat fix passed.
 - PR: https://github.com/PinguApps/RazorStyle/pull/52; implementation 693eb9f passed CI and PR Agent review with no findings.
 - Risk: Adds Microsoft.CodeAnalysis.CSharp 5.9.0 at runtime. Copilot review hit account quota; no code fix applies.
-- Workflow: Installed C:/Users/pingu/.agents/skills/finish-pr supports the active PR Agent integration; repository-vendored skill targets Gitar instead.
-- Next actions: Verify final diary commit's checks/review; leave merging and releasing to Pingu.
+- Next actions: Verify diary follow-up checks/review; leave merging and releasing to Pingu.
 - Key paths: src/PinguApps.RazorStyle.Core/Parsing/RazorTagScanner.cs; src/PinguApps.RazorStyle.Core/Rules/ChildContentLineRule.cs; tests/PinguApps.RazorStyle.Tests/Features/ComplexAttributeValues.feature.
 
 ## Session log
@@ -23,3 +22,9 @@
 - Open and inspect PR #52 [review] (impact: low)
   - Change: Published two implementation commits; registered PR with T3; verified CI, PR Agent approval, no unresolved threads and clean merge probe.
   - Notes: Copilot logs confirm monthly quota exhaustion. Final diary commit requires refreshed HEAD checks.
+
+### 2026-10-14 14:44 Z (agent/fix-issue-10)
+- Remove machine-specific workflow details [review] (impact: low)
+  - Why: PR Agent identified an unnecessary absolute user-home path in the diary.
+  - Change: Removed the workflow line; retained the diary required by AGENTS.md (files: .diary/fix-issue-10.md).
+  - Notes: Verified no absolute filesystem paths remain. Required tests passed all 42 cases on 51a5b14; this follow-up changes documentation only.
