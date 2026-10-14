@@ -1,3 +1,6 @@
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+
 namespace PinguApps.RazorStyle.Core.Parsing;
 
 /// <summary>
@@ -81,7 +84,7 @@ public sealed class RazorTagScanner
         return tags;
     }
 
-    private static bool TryParseTag(string text, int tagStart, LineMap lineMap, out TagInfo? tag)
+    internal static bool TryParseTag(string text, int tagStart, LineMap lineMap, out TagInfo? tag)
     {
         tag = null;
 
@@ -144,12 +147,34 @@ public sealed class RazorTagScanner
 
         int cursor = attributeStart;
         char? quote = null;
-        int parenthesisDepth = 0;
         int lastNonWhitespace = attributeStart;
 
         while (cursor < text.Length)
         {
             char current = text[cursor];
+
+            if (current == '@' && cursor + 1 < text.Length && text[cursor + 1] == '@')
+            {
+                lastNonWhitespace = cursor + 1;
+                cursor += 2;
+                continue;
+            }
+
+            int expressionStart = current == '@'
+                ? FindExpressionParenthesis(text, cursor + 1)
+                : current == '(' && quote is null ? cursor : -1;
+
+            if (expressionStart >= 0)
+            {
+                if (!TryReadExpressionEnd(text, expressionStart, out int expressionEnd))
+                {
+                    return false;
+                }
+
+                lastNonWhitespace = expressionEnd;
+                cursor = expressionEnd + 1;
+                continue;
+            }
 
             if (quote is not null)
             {
@@ -170,47 +195,28 @@ public sealed class RazorTagScanner
                 continue;
             }
 
-            if (current == '(')
+            if (current == '>' || (current == '/' && cursor + 1 < text.Length && text[cursor + 1] == '>'))
             {
-                parenthesisDepth++;
-                lastNonWhitespace = cursor;
-                cursor++;
-                continue;
+                break;
             }
 
-            if (current == ')' && parenthesisDepth > 0)
+            if (current == '<')
             {
-                parenthesisDepth--;
-                lastNonWhitespace = cursor;
-                cursor++;
-                continue;
+                return false;
             }
 
-            if (parenthesisDepth == 0)
+            if (char.IsWhiteSpace(current))
             {
-                if (current == '>' || (current == '/' && cursor + 1 < text.Length && text[cursor + 1] == '>'))
+                int nextNonWhitespace = SkipWhitespace(text, cursor);
+                if (nextNonWhitespace >= text.Length || text[nextNonWhitespace] == '>' ||
+                    (text[nextNonWhitespace] == '/' && nextNonWhitespace + 1 < text.Length && text[nextNonWhitespace + 1] == '>'))
                 {
                     break;
                 }
 
-                if (current == '<')
+                if (text[nextNonWhitespace] != '=' && text[lastNonWhitespace] != '=')
                 {
-                    return false;
-                }
-
-                if (char.IsWhiteSpace(current))
-                {
-                    int nextNonWhitespace = SkipWhitespace(text, cursor);
-                    if (nextNonWhitespace >= text.Length || text[nextNonWhitespace] == '>' ||
-                        (text[nextNonWhitespace] == '/' && nextNonWhitespace + 1 < text.Length && text[nextNonWhitespace + 1] == '>'))
-                    {
-                        break;
-                    }
-
-                    if (text[nextNonWhitespace] != '=' && text[lastNonWhitespace] != '=')
-                    {
-                        break;
-                    }
+                    break;
                 }
             }
 
@@ -222,7 +228,7 @@ public sealed class RazorTagScanner
             cursor++;
         }
 
-        if (quote is not null || parenthesisDepth != 0 || cursor == attributeStart)
+        if (quote is not null || cursor == attributeStart)
         {
             return false;
         }
@@ -241,6 +247,43 @@ public sealed class RazorTagScanner
         LineColumn position = lineMap.GetLineColumn(attributeStart);
         attribute = new AttributeInfo(text[attributeStart..(attributeEnd + 1)], attributeStart, attributeEnd, position.Line, position.Column);
         return true;
+    }
+
+    private static int FindExpressionParenthesis(string text, int cursor)
+    {
+        while (cursor < text.Length && (char.IsLetterOrDigit(text[cursor]) || text[cursor] is '_' or '.' or '?'))
+        {
+            cursor++;
+        }
+
+        return cursor < text.Length && text[cursor] == '(' ? cursor : -1;
+    }
+
+    private static bool TryReadExpressionEnd(string text, int startIndex, out int expressionEnd)
+    {
+        expressionEnd = -1;
+        int depth = 0;
+
+        // C# tokens keep parentheses in strings, interpolations and comments out of the balance count.
+        foreach (SyntaxToken token in SyntaxFactory.ParseTokens(text, offset: startIndex, initialTokenPosition: startIndex))
+        {
+            if (token.ContainsDiagnostics)
+            {
+                return false;
+            }
+
+            if (token.IsKind(SyntaxKind.OpenParenToken))
+            {
+                depth++;
+            }
+            else if (token.IsKind(SyntaxKind.CloseParenToken) && --depth == 0)
+            {
+                expressionEnd = token.Span.End - 1;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static int SkipWhitespace(string text, int index)
