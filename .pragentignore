@@ -1,0 +1,5 @@
+# PR Agent review exclusions use Git ignore syntax and do not affect Git tracking.
+# The tracked repository audit found no generated outputs needing exclusion.
+# Keep source, configuration, lockfiles, package icons and agent instructions reviewable.
+# Use $pragent-ignore before adding exclusions; identify the generator or source of truth
+# and validate both excluded outputs and nearby files that must remain reviewable.
