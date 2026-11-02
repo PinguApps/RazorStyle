@@ -5,6 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <ProjectReference Include="..\..\src\PinguApps.RazorStyle.CodeFixes\PinguApps.RazorStyle.CodeFixes.csproj" />
     <ProjectReference Include="..\..\src\PinguApps.RazorStyle.Core\PinguApps.RazorStyle.Core.csproj" />
   </ItemGroup>
 

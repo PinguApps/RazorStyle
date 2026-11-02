@@ -7,6 +7,8 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/PinguApps.RazorStyle.CodeAnalysis/PinguApps.RazorStyle.CodeAnalysis.csproj" />
+    <Project Path="src/PinguApps.RazorStyle.CodeFixes/PinguApps.RazorStyle.CodeFixes.csproj" />
     <Project Path="src/PinguApps.RazorStyle.Build/PinguApps.RazorStyle.Build.csproj" />
     <Project Path="src/PinguApps.RazorStyle.Cli/PinguApps.RazorStyle.Cli.csproj" />
     <Project Path="src/PinguApps.RazorStyle.Core/PinguApps.RazorStyle.Core.csproj" />
