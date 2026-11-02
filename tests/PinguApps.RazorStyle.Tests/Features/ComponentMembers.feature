@@ -1,6 +1,77 @@
 Feature: Component member conventions
     Authored partial components have predictable member layout without changing behaviour.
 
+Scenario: Binding partners in different files have both locations
+    Given the component C# source is
+        """
+        public partial class Example : ComponentBase
+        {
+            [Parameter] public int Value { get; set; }
+        }
+        """
+    And another authored C# part is
+        """
+        public partial class Example
+        {
+            [Parameter] public EventCallback<int> ValueChanged { get; set; }
+        }
+        """
+    When component conventions are checked
+    Then there are 2 component ordering diagnostics
+    And each ordering diagnostic identifies its binding partner
+    And there are 0 safe component ordering fixes
+
+Scenario: Aliased framework parameters retain semantic identity
+    Given the component C# source is
+        """
+        using Param = Microsoft.AspNetCore.Components.ParameterAttribute;
+        public partial class Example : ComponentBase
+        {
+            private int state;
+            [Param] public int Value { get; set; }
+        }
+        """
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    When the safe component ordering fix is applied
+    And component conventions are checked
+    Then there are 0 component ordering diagnostics
+
+Scenario: Every lifecycle hook follows the approved sequence
+    Given the component C# source is
+        """
+        public partial class Example : ComponentBase
+        {
+            protected override Task OnAfterRenderAsync(bool firstRender) => Task.CompletedTask;
+            protected override void OnAfterRender(bool firstRender) { }
+            protected override bool ShouldRender() => true;
+            protected override Task OnParametersSetAsync() => Task.CompletedTask;
+            protected override void OnParametersSet() { }
+            protected override Task OnInitializedAsync() => Task.CompletedTask;
+            protected override void OnInitialized() { }
+        }
+        """
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    When the safe component ordering fix is applied
+    And component conventions are checked
+    Then there are 0 component ordering diagnostics
+
+Scenario: Conditional member boundaries prevent a fix
+    Given the component C# source is
+        """
+        public partial class Example : ComponentBase
+        {
+        #if true
+            private void Work() { }
+        #endif
+            [Parameter] public int Value { get; set; }
+        }
+        """
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    And there are 0 safe component ordering fixes
+
 Scenario: Fix All orders multiple components without generating members
     Given the component C# source is
         """
@@ -258,7 +329,8 @@ Scenario: Observable initialization order prevents a fix
         {
             private int state = Next();
             [Parameter] public int Value { get; set; } = Next();
-            private static int Next() => 1;
+            private static int counter;
+            private static int Next() => ++counter;
         }
         """
     When component conventions are checked

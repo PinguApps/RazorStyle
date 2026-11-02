@@ -32,6 +32,21 @@ public sealed class ComponentMemberSteps : IDisposable
         _document = project.AddDocument("Example.razor.cs", SourceText.From("using System; using System.Threading.Tasks; using Microsoft.AspNetCore.Components;\n" + source));
     }
 
+    [Given("another authored C# part is")]
+    public void GivenAnotherPart(string source)
+    {
+        DocumentId original = _document!.Id;
+        Project project = _document.Project.AddDocument("Other.cs", SourceText.From(
+            "using Microsoft.AspNetCore.Components;\n" + source)).Project;
+        _document = project.GetDocument(original)!;
+    }
+
+    [Then("each ordering diagnostic identifies its binding partner")]
+    public void ThenPartnerLocations()
+    {
+        Assert.All(_diagnostics.Where(d => d.Id == ComponentMemberAnalyzer.OrderingId), d => Assert.Single(d.AdditionalLocations));
+    }
+
     [When("component ordering Fix All is applied")]
     public async Task WhenFixAll()
     {

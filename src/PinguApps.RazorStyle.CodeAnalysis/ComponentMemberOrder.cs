@@ -27,7 +27,8 @@ internal sealed class ComponentMemberOrder
                 && value.Type.TypeKind != TypeKind.Error
                 && (IsFramework(named, "EventCallback") || (IsFramework(named, "EventCallback`1")
                 && SymbolEqualityComparer.IncludeNullability.Equals(named.TypeArguments[0], value.Type))))];
-            if (callbacks.Length == 1 && !_pairs.ContainsKey(callbacks[0]) && !_pairs.ContainsValue(value))
+            if (callbacks.Length == 1 && parameters.Count(p => p.Name == value.Name) == 1
+                && !_pairs.ContainsKey(callbacks[0]) && !_pairs.ContainsValue(callbacks[0]) && !_pairs.ContainsValue(value))
             {
                 _pairs.Add(value, callbacks[0]);
             }
@@ -74,6 +75,7 @@ internal sealed class ComponentMemberOrder
     }
 
     public bool CanFix => ExternalPairs.Count == 0 && !_declaration.ContainsDiagnostics
+        && !_model.GetDiagnostics(_declaration.Span, _cancellationToken).Any(d => d.Severity == DiagnosticSeverity.Error)
         && !_declaration.DescendantTrivia(descendIntoTrivia: true).Any(t => t.IsDirective)
         && !_declaration.Members.Any(m => m is BaseTypeDeclarationSyntax or DelegateDeclarationSyntax)
         && _declaration.Members.Where(HasInitializer).SequenceEqual(OrderedMembers.Where(HasInitializer));
@@ -167,7 +169,11 @@ internal sealed class ComponentMemberOrder
             foreach (string contract in new[] { "System.IDisposable", "System.IAsyncDisposable" })
             {
                 INamedTypeSymbol? type = _model.Compilation.GetTypeByMetadataName(contract);
-                foreach (ISymbol slot in type?.GetMembers() ?? [])
+                if (type is null || type.TypeKind != TypeKind.Interface || type.DeclaringSyntaxReferences.Length != 0)
+                {
+                    continue;
+                }
+                foreach (ISymbol slot in type.GetMembers())
                 {
                     ISymbol? implementation = _component.FindImplementationForInterfaceMember(slot);
                     for (IMethodSymbol? current = method; current is not null; current = current.OverriddenMethod)
@@ -196,4 +202,3 @@ internal sealed class ComponentMemberOrder
         return 1000;
     }
 }
-

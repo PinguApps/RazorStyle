@@ -41,5 +41,3 @@ public sealed class ComponentMemberCodeFixProvider : CodeFixProvider
                 declaration.WithMembers(SyntaxFactory.List(order.OrderedMembers))))), "OrderComponentMembers"), context.Diagnostics);
     }
 }
-
-

@@ -1,5 +1,8 @@
 # RazorStyle
 
+Component code-behind conventions, compiler enforcement and safe editor fixes
+are described in [Component members](docs/component-members.md).
+
 | | CLI Tool | Build Package |
 | --- | --- | --- |
 | Version | [![PinguApps.RazorStyle.Cli version](https://img.shields.io/nuget/v/PinguApps.RazorStyle.Cli?style=for-the-badge&label=PinguApps.RazorStyle.Cli)](https://www.nuget.org/packages/PinguApps.RazorStyle.Cli/) | [![PinguApps.RazorStyle version](https://img.shields.io/nuget/v/PinguApps.RazorStyle?style=for-the-badge&label=PinguApps.RazorStyle)](https://www.nuget.org/packages/PinguApps.RazorStyle/) |
