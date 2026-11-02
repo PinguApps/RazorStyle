@@ -1,6 +1,74 @@
 Feature: Component member conventions
     Authored partial components have predictable member layout without changing behaviour.
 
+Scenario: Compiler errors withhold a fix
+    Given the component C# source is
+        """
+        public partial class Example : ComponentBase
+        {
+            private void Work() { Missing(); }
+            [Parameter] public int Value { get; set; }
+        }
+        """
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    And there are 0 safe component ordering fixes
+
+Scenario: Fixes preserve attributes and cleanup relative order
+    Given the component C# source is
+        """
+        public partial class Example : ComponentBase, IDisposable, IAsyncDisposable
+        {
+            public ValueTask DisposeAsync() => default;
+            public void Dispose() { }
+            // Keep this parameter comment.
+            [ParameterAttribute, EditorRequired] public int Value { get; set; }
+            private void Work() { }
+        }
+        """
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    When the safe component ordering fix is applied
+    And component conventions are checked
+    Then there are 0 component ordering diagnostics
+    And there are 0 safe component ordering fixes
+    And the component source contains "[ParameterAttribute, EditorRequired] public int Value { get; set; }"
+    And the component source contains "Keep this parameter comment."
+    And component member "Work()" appears before "DisposeAsync()"
+    And component member "DisposeAsync()" appears before "void Dispose()"
+
+Scenario: Explicit interface properties and events retain their groups
+    Given the component C# source is
+        """
+        public interface IContract { int State { get; } event Action Updated; }
+        public partial class Example : ComponentBase, IContract
+        {
+            event Action IContract.Updated { add { } remove { } }
+            int IContract.State => 0;
+        }
+        """
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    When the safe component ordering fix is applied
+    And component conventions are checked
+    Then there are 0 component ordering diagnostics
+    And component member "IContract.State" appears before "IContract.Updated"
+
+Scenario: Generic content follows ordinary optional parameters
+    Given the component C# source is
+        """
+        public partial class Example<T> : ComponentBase
+        {
+            [Parameter] public RenderFragment<T> Template { get; set; }
+            [Parameter] public int Value { get; set; }
+        }
+        """
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    When the safe component ordering fix is applied
+    And component conventions are checked
+    Then there are 0 component ordering diagnostics
+
 Scenario: Binding partners in different files have both locations
     Given the component C# source is
         """

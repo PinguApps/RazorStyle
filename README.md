@@ -1,7 +1,7 @@
 # RazorStyle
 
 Component code-behind conventions, compiler enforcement and safe editor fixes
-are described in [Component members](docs/component-members.md).
+are described in [Component members](https://github.com/PinguApps/RazorStyle/blob/main/docs/component-members.md).
 
 | | CLI Tool | Build Package |
 | --- | --- | --- |

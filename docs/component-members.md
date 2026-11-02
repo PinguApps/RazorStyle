@@ -45,7 +45,7 @@ Aliases, qualified attribute names and `Attribute` suffixes are supported.
 The **Order component members** editor fix supports Roslyn Fix All. It moves
 attributes, documentation and attached comments with members, retaining bodies
 and signatures. It withholds the fix when the declaration contains syntax
-errors, nested types, directives (including regions), a binding partner in
+or compiler errors, nested types, directives (including regions), a binding partner in
 another partial declaration, or a change in the relative order of initialized
 fields/properties. Diagnostics still explain what needs manual attention. A
 cross-part binding diagnostic includes the partner location. No members are
@@ -54,7 +54,7 @@ generated or transferred between files.
 ## Build enforcement
 
 Install the existing package using `PackageReference`. Roslyn analyzes authored
-`.razor.cs` compilation inputs; the existing markup check remains separate.
+partial component classes (typically `.razor.cs`); the existing markup check remains separate.
 Use standard `.editorconfig` severities to enforce these warnings as errors:
 
 ```ini

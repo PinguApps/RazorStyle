@@ -94,5 +94,14 @@ public sealed class ComponentMemberSteps : IDisposable
     [Then("the component source contains {string}")]
     public async Task ThenContains(string text) => Assert.Contains(text, (await _document!.GetTextAsync()).ToString(), StringComparison.Ordinal);
 
+    [Then("component member {string} appears before {string}")]
+    public async Task ThenMemberOrder(string first, string second)
+    {
+        string text = (await _document!.GetTextAsync()).ToString();
+        int firstIndex = text.IndexOf(first, StringComparison.Ordinal);
+        int secondIndex = text.IndexOf(second, StringComparison.Ordinal);
+        Assert.True(firstIndex >= 0 && secondIndex > firstIndex);
+    }
+
     public void Dispose() => _workspace.Dispose();
 }
