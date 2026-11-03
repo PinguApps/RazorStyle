@@ -337,7 +337,7 @@ public partial class ExampleControl : ComponentBase, IDisposable, IAsyncDisposab
 ```
 
 An ordering diagnostic names the first correction, for example
-`Move 'int Example.Value' before 'void Example.Work()'.`, and includes all twelve groups,
+`Move 'int Example.Value' before 'void Example.Work()'.`, and includes all thirteen groups,
 the lifecycle sequence and the binding-pair requirement in the message itself.
 After correcting that position, recheck for any remaining violations. For a pair
 split across partial declarations, the diagnostic names both partners, identifies
