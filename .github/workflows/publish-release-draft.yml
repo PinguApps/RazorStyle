@@ -63,6 +63,7 @@ jobs:
     if: needs.publish_draft.outputs.tag != ''
     permissions:
       contents: read
+      id-token: write
     uses: ./.github/workflows/publish.yml
     with:
       tag: ${{ needs.publish_draft.outputs.tag }}
