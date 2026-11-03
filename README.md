@@ -230,17 +230,18 @@ Put the members present in **each partial declaration** in this exact order:
 4. **Standalone callback parameters**: `EventCallback` / `EventCallback<T>`
    parameters without an associated value parameter, such as `OnSaved`.
 5. **Content parameters**: `RenderFragment` and `RenderFragment<T>`.
-6. **Constants and fields**: static, readonly, injected dependencies, mutable
+6. **Query-supplied properties**: `[SupplyParameterFromQuery]` properties without `[Parameter]`.
+7. **Constants and fields**: static, readonly, injected dependencies, mutable
    state, and component/element reference fields all share this group.
-7. **Constructors**.
-8. **Other properties**, including explicit-interface properties.
-9. **Ordinary .NET events**, including field-like events and custom/explicit-interface accessors.
-10. **Lifecycle overrides**, in the exact sequence below.
-11. **All other methods**, including helpers, handlers and `SetParametersAsync`.
-12. **Disposal implementations**: both `IDisposable.Dispose` and
+8. **Constructors**.
+9. **Other properties**, including explicit-interface properties.
+10. **Ordinary .NET events**, including field-like events and custom/explicit-interface accessors.
+11. **Lifecycle overrides**, in the exact sequence below.
+12. **All other methods**, including helpers, handlers and `SetParametersAsync`.
+13. **Disposal implementations**: both `IDisposable.Dispose` and
     `IAsyncDisposable.DisposeAsync`, including explicit-interface implementations.
 
-Within group 10, the lifecycle sequence is:
+Within group 11, the lifecycle sequence is:
 
 1. `OnInitialized()`
 2. `OnInitializedAsync()`
@@ -336,7 +337,7 @@ public partial class ExampleControl : ComponentBase, IDisposable, IAsyncDisposab
 ```
 
 An ordering diagnostic names the first correction, for example
-`Move 'int Example.Value' before 'void Example.Work()'.`, and includes all twelve groups,
+`Move 'int Example.Value' before 'void Example.Work()'.`, and includes all thirteen groups,
 the lifecycle sequence and the binding-pair requirement in the message itself.
 After correcting that position, recheck for any remaining violations. For a pair
 split across partial declarations, the diagnostic names both partners, identifies

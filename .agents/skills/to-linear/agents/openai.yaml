@@ -1,5 +1,0 @@
-interface:
-  display_name: "To Linear"
-  short_description: "Publish ordered milestones and tickets to Linear"
-policy:
-  allow_implicit_invocation: false

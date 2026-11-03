@@ -14,7 +14,7 @@ Scenario: Ordering diagnostics identify the correction and spell out the convent
     Then there are 1 component ordering diagnostics
     And a component diagnostic explains "Move 'int Example.Value' before 'void Example.Work()'."
     And a component diagnostic explains "Expected groups: 1 cascading parameters; 2 editor-required parameter groups; 3 optional parameter groups"
-    And a component diagnostic explains "12 Dispose/DisposeAsync implementations"
+    And a component diagnostic explains "13 Dispose/DisposeAsync implementations"
     And a component diagnostic explains "XChanged immediately follows X and takes X's required/optional group"
     And a component diagnostic explains "OnInitialized(), OnInitializedAsync(), OnParametersSet(), OnParametersSetAsync(), ShouldRender(), OnAfterRender(bool), OnAfterRenderAsync(bool)"
 
@@ -472,3 +472,32 @@ Scenario: Ordinary classes are unaffected
     When component conventions are checked
     Then there are 0 component ordering diagnostics
     And there are 0 nested component type diagnostics
+
+Scenario: Query-supplied properties follow every parameter group and precede fields
+    Given the component C# source is
+        """
+        using Query = Microsoft.AspNetCore.Components.SupplyParameterFromQueryAttribute;
+        public partial class Example : ComponentBase
+        {
+            private int state;
+            [SupplyParameterFromQuery] private string Search { get; set; }
+            [Query(Name = "page")] public int Page { get; set; }
+            [Parameter] public RenderFragment Content { get; set; }
+            [Parameter] public EventCallback OnSaved { get; set; }
+            [Parameter] public EventCallback<int> ValueChanged { get; set; }
+            [Parameter, SupplyParameterFromQuery] public int Value { get; set; }
+            [Parameter, EditorRequired] public string Title { get; set; }
+        }
+        """
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    When the safe component ordering fix is applied
+    And component conventions are checked
+    Then there are 0 component ordering diagnostics
+    And component member "Title {" appears before "Value {"
+    And component member "Value {" appears before "ValueChanged {"
+    And component member "ValueChanged {" appears before "OnSaved {"
+    And component member "OnSaved {" appears before "Content {"
+    And component member "Content {" appears before "Search {"
+    And component member "Search {" appears before "Page {"
+    And component member "Page {" appears before "int state"
