@@ -163,7 +163,7 @@ internal sealed class ComponentMemberOrder
                 return 200;
             }
 
-            return 700;
+            return HasAttribute(property, "SupplyParameterFromQuery") ? 450 : 700;
         }
 
         if (member is FieldDeclarationSyntax)

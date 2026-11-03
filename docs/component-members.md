@@ -19,14 +19,15 @@ The member groups, in order, are:
 3. Optional parameter groups.
 4. Standalone callback parameters.
 5. Content parameters (`RenderFragment` and `RenderFragment<T>`).
-6. Constants and fields.
-7. Constructors.
-8. Other properties.
-9. .NET events, including custom accessors.
-10. Lifecycle overrides: `OnInitialized`, `OnInitializedAsync`, `OnParametersSet`,
+6. Query-supplied properties (`[SupplyParameterFromQuery]`) without `[Parameter]`.
+7. Constants and fields.
+8. Constructors.
+9. Other properties.
+10. .NET events, including custom accessors.
+11. Lifecycle overrides: `OnInitialized`, `OnInitializedAsync`, `OnParametersSet`,
     `OnParametersSetAsync`, `ShouldRender`, `OnAfterRender`, `OnAfterRenderAsync`.
-11. Other methods, including `SetParametersAsync`.
-12. Both `IDisposable.Dispose` and `IAsyncDisposable.DisposeAsync` implementations.
+12. Other methods, including `SetParametersAsync`.
+13. Both `IDisposable.Dispose` and `IAsyncDisposable.DisposeAsync` implementations.
 
 Omitted groups and hooks are allowed. Relative order within a group is retained,
 including the relative order of Dispose and DisposeAsync. Ordinary helpers,
