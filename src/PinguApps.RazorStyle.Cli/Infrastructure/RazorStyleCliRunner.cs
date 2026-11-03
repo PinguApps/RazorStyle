@@ -25,7 +25,16 @@ public static class RazorStyleCliRunner
 
         try
         {
-            IReadOnlyList<string> files = RazorStyleRunner.FindRazorFiles(settings.Path);
+            string markupPath = settings.Path;
+            if (File.Exists(settings.Path) && Path.GetExtension(settings.Path).Equals(".csproj", StringComparison.OrdinalIgnoreCase))
+            {
+                markupPath = Path.GetDirectoryName(Path.GetFullPath(settings.Path))!;
+            }
+            else if (settings.Path.EndsWith(".razor.cs", StringComparison.OrdinalIgnoreCase) && File.Exists(settings.Path[..^3]))
+            {
+                markupPath = settings.Path[..^3];
+            }
+            IReadOnlyList<string> files = RazorStyleRunner.FindRazorFiles(markupPath);
             int diagnosticCount = 0;
             int changedFileCount = 0;
 
@@ -52,11 +61,21 @@ public static class RazorStyleCliRunner
                 }
             }
 
+            if (command == "check" && (options.IsRuleEnabled("PARS0004") || options.IsRuleEnabled("PARS0005")))
+            {
+                IReadOnlyList<RazorDiagnostic> componentDiagnostics = ComponentProjectChecker.CheckAsync(settings.Path, options).GetAwaiter().GetResult();
+                foreach (RazorDiagnostic diagnostic in componentDiagnostics)
+                {
+                    diagnosticCount++;
+                    WriteDiagnostic(diagnostic);
+                }
+            }
+
             return command == "fix"
                 ? WriteFixSummary(changedFileCount, diagnosticCount)
                 : WriteCheckSummary(files.Count, diagnosticCount);
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or DirectoryNotFoundException)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or InvalidOperationException)
         {
             AnsiConsole.MarkupLine(CultureInfo.InvariantCulture, "[red]RazorStyle error:[/] {0}", exception.Message);
             return 2;

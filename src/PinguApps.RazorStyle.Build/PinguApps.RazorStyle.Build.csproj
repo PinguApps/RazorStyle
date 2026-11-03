@@ -13,6 +13,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PinguApps.RazorStyle.CodeAnalysis\PinguApps.RazorStyle.CodeAnalysis.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <ProjectReference Include="..\PinguApps.RazorStyle.CodeFixes\PinguApps.RazorStyle.CodeFixes.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <None Include="..\PinguApps.RazorStyle.CodeAnalysis\bin\$(Configuration)\netstandard2.0\PinguApps.RazorStyle.CodeAnalysis.dll"
+          Pack="true" PackagePath="analyzers\dotnet\cs\" Visible="false" />
+    <None Include="..\PinguApps.RazorStyle.CodeFixes\bin\$(Configuration)\netstandard2.0\PinguApps.RazorStyle.CodeFixes.dll"
+          Pack="true" PackagePath="analyzers\dotnet\cs\" Visible="false" />
     <None Include="buildTransitive\PinguApps.RazorStyle.props"
           Pack="true"
           PackagePath="buildTransitive\" />
