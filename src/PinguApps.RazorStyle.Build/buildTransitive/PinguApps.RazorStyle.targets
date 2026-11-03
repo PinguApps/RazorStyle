@@ -5,6 +5,10 @@
     <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0001)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0001</RazorStyleDisabledRuleArguments>
     <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0002)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0002</RazorStyleDisabledRuleArguments>
     <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0003)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0003</RazorStyleDisabledRuleArguments>
+    <!-- Component diagnostics run in the compiler during builds. Avoid loading this project recursively in the embedded CLI. -->
+    <RazorStyleDisabledRuleArguments>$(RazorStyleDisabledRuleArguments) --disable PARS0004 --disable PARS0005</RazorStyleDisabledRuleArguments>
+    <NoWarn Condition="'$(DisablePARS0004)' == 'true'">$(NoWarn);PARS0004</NoWarn>
+    <NoWarn Condition="'$(DisablePARS0005)' == 'true'">$(NoWarn);PARS0005</NoWarn>
     <RazorStyleAttributeOrderArguments></RazorStyleAttributeOrderArguments>
     <RazorStyleAttributeOrderArguments Condition="'$(RazorStylePreserveAttributeSplattingOrder)' == 'true'"> --preserve-attribute-splatting-order</RazorStyleAttributeOrderArguments>
   </PropertyGroup>

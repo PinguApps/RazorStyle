@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 namespace PinguApps.RazorStyle.Cli.Commands;
 
 /// <summary>
-/// Checks Razor files for RazorStyle rule violations.
+/// Checks Razor markup and component code for RazorStyle rule violations.
 /// </summary>
 public sealed class CheckCommand : Command<RazorStyleCommandSettings>
 {

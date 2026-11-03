@@ -29,15 +29,18 @@ public sealed class ComponentMemberSteps : IDisposable
         Project project = _workspace.AddProject("Component", LanguageNames.CSharp)
             .WithCompilationOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
             .WithMetadataReferences(references);
-        _document = project.AddDocument("Example.razor.cs", SourceText.From("using System; using System.Threading.Tasks; using Microsoft.AspNetCore.Components;\n" + source));
+        _document = project.AddDocument("Example.razor.cs", SourceText.From("using System; using System.Threading.Tasks; using Microsoft.AspNetCore.Components;\n" + source), filePath: "Example.razor.cs");
     }
+
+    [Given("the component filename is {string}")]
+    public void GivenFilename(string filename) => _document = _document!.WithFilePath(filename);
 
     [Given("another authored C# part is")]
     public void GivenAnotherPart(string source)
     {
         DocumentId original = _document!.Id;
-        Project project = _document.Project.AddDocument("Other.cs", SourceText.From(
-            "using Microsoft.AspNetCore.Components;\n" + source)).Project;
+        Project project = _document.Project.AddDocument("Other.razor.cs", SourceText.From(
+            "using Microsoft.AspNetCore.Components;\n" + source), filePath: "Other.razor.cs").Project;
         _document = project.GetDocument(original)!;
     }
 

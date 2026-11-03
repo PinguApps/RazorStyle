@@ -51,6 +51,8 @@ Override behaviour with MSBuild properties:
   <DisablePARS0001>false</DisablePARS0001>
   <DisablePARS0002>false</DisablePARS0002>
   <DisablePARS0003>false</DisablePARS0003>
+  <DisablePARS0004>false</DisablePARS0004>
+  <DisablePARS0005>false</DisablePARS0005>
   <RazorStylePreserveAttributeSplattingOrder>false</RazorStylePreserveAttributeSplattingOrder>
 </PropertyGroup>
 ```
@@ -73,11 +75,20 @@ Check files:
 razorstyle check .\src
 ```
 
+Component checks load the actual C# projects and references, so restore those
+projects first. They apply to authored partial classes whose inheritance chain
+reaches `ComponentBase`, whether in `.razor.cs` or another `.cs` file. Project
+paths and individual component files are also supported. See
+[component checks and switches](https://github.com/PinguApps/RazorStyle/blob/main/docs/component-members.md#standalone-cli-check).
+
 Fix files:
 
 ```powershell
 razorstyle fix .\src
 ```
+
+The `fix` command applies supported markup fixes. Use the editor ordering
+action or Fix All for safe C# member reordering; nested-type extraction is manual.
 
 Disable specific rules for a run:
 
@@ -99,6 +110,8 @@ Use the CLI when you want direct control over when RazorStyle runs. It is a good
 - `PARS0001`: start-tag attributes must wrap and align consistently.
 - `PARS0002`: child content must appear on its own line.
 - `PARS0003`: attributes must follow the preferred RazorStyle order.
+- `PARS0004`: component members must follow the approved order, including binding pairs and lifecycle hooks.
+- `PARS0005`: component code-behinds must not contain nested types.
 
 ### PARS0001 Attribute Wrapping
 

@@ -1,6 +1,23 @@
 Feature: Component member conventions
     Authored partial components have predictable member layout without changing behaviour.
 
+Scenario: Components in ordinary C# files are identified through their inherited base
+    Given the component C# source is
+        """
+        public class Intermediate : ComponentBase { }
+        public partial class Example : Intermediate
+        {
+            private void Work() { }
+            [Parameter] public int Value { get; set; }
+            private class Nested { }
+        }
+        """
+    And the component filename is "Example.cs"
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    And there are 1 nested component type diagnostics
+    And there are 0 safe component ordering fixes
+
 Scenario: Compiler errors withhold a fix
     Given the component C# source is
         """

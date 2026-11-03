@@ -7,7 +7,7 @@ app.Configure(config =>
     config.SetApplicationName("razorstyle");
 
     config.AddCommand<CheckCommand>("check")
-        .WithDescription("Checks Razor files for RazorStyle rule violations.")
+        .WithDescription("Checks Razor markup and component code for RazorStyle rule violations.")
         .WithExample(["check", "./src"])
         .WithExample(["check", "./src", "--disable", "PARS0001"])
         .WithExample(["check", "./src", "--disable", "PARS0001", "--disable", "PARS0002"]);
