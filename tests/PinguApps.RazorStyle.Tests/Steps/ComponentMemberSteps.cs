@@ -82,6 +82,9 @@ public sealed class ComponentMemberSteps : IDisposable
     [Then("there are {int} nested component type diagnostics")]
     public void ThenNested(int count) => Assert.Equal(count, _diagnostics.Count(d => d.Id == ComponentMemberAnalyzer.NestedTypeId));
 
+    [Then("a component diagnostic explains {string}")]
+    public void ThenMessage(string text) => Assert.Contains(_diagnostics, diagnostic => diagnostic.GetMessage().Contains(text, StringComparison.Ordinal));
+
     [Then("there are {int} safe component ordering fixes")]
     public void ThenFixes(int count) => Assert.Equal(count, _actions.Count);
 

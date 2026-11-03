@@ -15,6 +15,9 @@ Scenario: Standalone check catches both rules using the generated component iden
     Then the CLI exits with 1
     And the CLI reports "PARS0004"
     And the CLI reports "PARS0005"
+    And the CLI reports "Expected groups: 1 cascading parameters"
+    And the CLI reports "Lifecycle order: OnInitialized()"
+    And the CLI reports "top-level types cannot be private"
 
 Scenario: CLI switches disable rules independently
     Given a restored component project for the CLI

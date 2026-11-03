@@ -1,5 +1,13 @@
 Feature: Razor style rules
 
+  Scenario: Attribute ordering diagnostics show the exact order for the offending tag
+    Given the Razor source is
+      """
+      <button data-track="save" class="btn" id="save-button" />
+      """
+    When RazorStyle check runs
+    Then RazorStyle should report "Attribute 'data-track' is out of order. Expected attribute order on this tag: id -> class -> data-track."
+
   @razorstyle
   Scenario: Common start tag forms are scanned
     Given the Razor source is

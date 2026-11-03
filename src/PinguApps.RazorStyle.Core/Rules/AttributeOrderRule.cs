@@ -46,7 +46,8 @@ public sealed class AttributeOrderRule : IRazorStyleRule
             AttributeInfo firstOutOfOrderAttribute = FindFirstOutOfOrderAttribute(tag.Attributes, orderedAttributes);
             diagnostics.Add(new RazorDiagnostic(
                 DiagnosticId,
-                "Attributes must appear in the preferred RazorStyle order.",
+                $"Attribute '{AttributeName.GetName(firstOutOfOrderAttribute.RawText)}' is out of order. "
+                    + $"Expected attribute order on this tag: {string.Join(" -> ", orderedAttributes.Select(attribute => AttributeName.GetName(attribute.RawText)))}.",
                 document.FilePath,
                 firstOutOfOrderAttribute.Line,
                 firstOutOfOrderAttribute.Column));

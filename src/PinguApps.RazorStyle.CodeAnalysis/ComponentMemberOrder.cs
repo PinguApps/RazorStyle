@@ -51,7 +51,7 @@ internal sealed class ComponentMemberOrder
                 Location? second = other.Locations.FirstOrDefault(l => l.IsInSource);
                 if (first is not null && second is not null)
                 {
-                    ExternalPairs.Add(Tuple.Create(first, second));
+                    ExternalPairs.Add((first, second, pair.Key.Name, pair.Value.Name));
                 }
             }
         }
@@ -60,6 +60,14 @@ internal sealed class ComponentMemberOrder
             .OrderBy(Rank).SelectMany(m => localPairs.TryGetValue(m, out MemberDeclarationSyntax? callback)
                 ? new[] { m, callback } : [m]).ToArray();
         IsOrdered = members.SequenceEqual(OrderedMembers);
+        for (int index = 0; index < members.Length; index++)
+        {
+            if (members[index] != OrderedMembers[index])
+            {
+                OrderingCorrection = $"Move '{MemberName(OrderedMembers[index])}' before '{MemberName(members[index])}'.";
+                break;
+            }
+        }
     }
 
     public IReadOnlyList<MemberDeclarationSyntax> OrderedMembers
@@ -67,7 +75,9 @@ internal sealed class ComponentMemberOrder
         get;
     }
 
-    public List<Tuple<Location, Location>> ExternalPairs { get; } = [];
+    public List<(Location Member, Location Partner, string ValueName, string CallbackName)> ExternalPairs { get; } = [];
+
+    public string OrderingCorrection { get; } = string.Empty;
 
     public bool IsOrdered
     {
@@ -96,6 +106,10 @@ internal sealed class ComponentMemberOrder
     }
 
     private static bool Same(ISymbol? left, ISymbol? right) => SymbolEqualityComparer.Default.Equals(left, right);
+
+    private string MemberName(MemberDeclarationSyntax member) => member is BaseFieldDeclarationSyntax field
+        ? string.Join(", ", field.Declaration.Variables.Select(variable => variable.Identifier.ValueText))
+        : _model.GetDeclaredSymbol(member, _cancellationToken)?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) ?? member.Kind().ToString();
 
     private static bool HasInitializer(MemberDeclarationSyntax member) => member switch
     {

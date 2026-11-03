@@ -1,6 +1,23 @@
 Feature: Component member conventions
     Authored partial components have predictable member layout without changing behaviour.
 
+Scenario: Ordering diagnostics identify the correction and spell out the convention
+    Given the component C# source is
+        """
+        public partial class Example : ComponentBase
+        {
+            private void Work() { }
+            [Parameter] public int Value { get; set; }
+        }
+        """
+    When component conventions are checked
+    Then there are 1 component ordering diagnostics
+    And a component diagnostic explains "Move 'int Example.Value' before 'void Example.Work()'."
+    And a component diagnostic explains "Expected groups: 1 cascading parameters; 2 editor-required parameter groups; 3 optional parameter groups"
+    And a component diagnostic explains "12 Dispose/DisposeAsync implementations"
+    And a component diagnostic explains "XChanged immediately follows X and takes X's required/optional group"
+    And a component diagnostic explains "OnInitialized(), OnInitializedAsync(), OnParametersSet(), OnParametersSetAsync(), ShouldRender(), OnAfterRender(bool), OnAfterRenderAsync(bool)"
+
 Scenario: Components in ordinary C# files are identified through their inherited base
     Given the component C# source is
         """
@@ -104,6 +121,9 @@ Scenario: Binding partners in different files have both locations
     When component conventions are checked
     Then there are 2 component ordering diagnostics
     And each ordering diagnostic identifies its binding partner
+    And a component diagnostic explains "Binding pair 'Value/ValueChanged' is split across partial declarations"
+    And a component diagnostic explains "Manually place 'ValueChanged' immediately after 'Value' in the same declaration"
+    And a component diagnostic explains "no cross-part automatic fix is offered"
     And there are 0 safe component ordering fixes
 
 Scenario: Aliased framework parameters retain semantic identity
