@@ -10,7 +10,7 @@ internal sealed class ComponentMemberOrder
     private readonly SemanticModel _model;
     private readonly INamedTypeSymbol _component;
     private readonly CancellationToken _cancellationToken;
-    private readonly Dictionary<IPropertySymbol, IPropertySymbol> _pairs = new(SymbolEqualityComparer.Default);
+    private readonly Dictionary<IPropertySymbol, IPropertySymbol> _pairs = [with(SymbolEqualityComparer.Default)];
     private readonly ClassDeclarationSyntax _declaration;
 
     public ComponentMemberOrder(ClassDeclarationSyntax declaration, SemanticModel model, CancellationToken cancellationToken)
