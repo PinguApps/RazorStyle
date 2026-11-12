@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
+    <UseAppHost>true</UseAppHost>
   </PropertyGroup>
 
   <ItemGroup>

@@ -16,7 +16,7 @@ public sealed class ComponentCliSteps : IDisposable
     public async Task GivenProject()
     {
         Directory.CreateDirectory(_directory);
-        await File.WriteAllTextAsync(Path.Combine(_directory, "global.json"), """{"sdk":{"version":"10.0.403","rollForward":"latestPatch"}}""");
+        await File.WriteAllTextAsync(Path.Combine(_directory, "global.json"), """{"sdk":{"version":"10.0.404","rollForward":"latestPatch"}}""");
         await File.WriteAllTextAsync(Path.Combine(_directory, "Fixture.csproj"), """
             <Project Sdk="Microsoft.NET.Sdk.Razor">
               <PropertyGroup><TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable></PropertyGroup>
@@ -40,7 +40,7 @@ public sealed class ComponentCliSteps : IDisposable
                 private class Nested { }
             }
             """);
-        (int code, string output) = await RunAsync(["restore", Path.Combine(_directory, "Fixture.csproj"), "--nologo", "-v:q"]);
+        (int code, string output) = await RunAsync(["restore", Path.Combine(_directory, "Fixture.csproj"), "--disable-build-servers", "--nologo", "-v:q"]);
         Assert.True(code == 0, output);
     }
 
@@ -105,7 +105,8 @@ public sealed class ComponentCliSteps : IDisposable
     private async Task<(int Code, string Output)> RunAsync(IEnumerable<string> arguments)
     {
         string runtime = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
-        string dotnet = Path.Combine(Directory.GetParent(runtime)!.Parent!.Parent!.FullName, OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet");
+        string dotnet = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH")
+            ?? Path.Combine(Directory.GetParent(runtime)!.Parent!.Parent!.FullName, OperatingSystem.IsWindows() ? "dotnet.exe" : "dotnet");
         ProcessStartInfo start = new(dotnet)
         {
             WorkingDirectory = _directory,
@@ -114,6 +115,13 @@ public sealed class ComponentCliSteps : IDisposable
             UseShellExecute = false,
         };
         start.Environment["DOTNET_ADD_GLOBAL_TOOLS_TO_PATH"] = "0";
+        start.Environment["DOTNET_CLI_USE_MSBUILD_SERVER"] = "0";
+        foreach (string name in start.Environment.Keys.Where(name => name.StartsWith("MSBUILD", StringComparison.OrdinalIgnoreCase)
+            || name.StartsWith("DOTNET_MSBUILD_SDK_RESOLVER_", StringComparison.OrdinalIgnoreCase)).ToArray())
+        {
+            start.Environment.Remove(name);
+        }
+        start.Environment["MSBUILDDISABLENODEREUSE"] = "1";
         foreach (string argument in arguments)
         {
             start.ArgumentList.Add(argument);

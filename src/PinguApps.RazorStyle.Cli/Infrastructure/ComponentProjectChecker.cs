@@ -74,7 +74,7 @@ internal static class ComponentProjectChecker
     private static async Task<IReadOnlyList<RazorDiagnostic>> AnalyzeProjectsAsync(string[] projects, string path, RazorStyleOptions options)
     {
         List<RazorDiagnostic> diagnostics = [];
-        HashSet<string> seen = new(StringComparer.Ordinal);
+        HashSet<string> seen = [with(StringComparer.Ordinal)];
         foreach (string projectPath in projects)
         {
             Dictionary<string, string> properties = new()
