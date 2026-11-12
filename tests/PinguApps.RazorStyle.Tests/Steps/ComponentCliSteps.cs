@@ -16,7 +16,7 @@ public sealed class ComponentCliSteps : IDisposable
     public async Task GivenProject()
     {
         Directory.CreateDirectory(_directory);
-        await File.WriteAllTextAsync(Path.Combine(_directory, "global.json"), """{"sdk":{"version":"10.0.403","rollForward":"latestPatch"}}""");
+        await File.WriteAllTextAsync(Path.Combine(_directory, "global.json"), """{"sdk":{"version":"10.0.404","rollForward":"latestPatch"}}""");
         await File.WriteAllTextAsync(Path.Combine(_directory, "Fixture.csproj"), """
             <Project Sdk="Microsoft.NET.Sdk.Razor">
               <PropertyGroup><TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable></PropertyGroup>

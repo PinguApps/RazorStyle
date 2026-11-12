@@ -35,6 +35,7 @@ jobs:
         uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6
         with:
           global-json-file: global.json
+          dotnet-version: 10.0.404
 
       - name: Restore solution
         run: dotnet restore PinguApps.RazorStyle.slnx
