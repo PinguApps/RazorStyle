@@ -38,6 +38,8 @@
   </Target>
 
   <Target Name="IncludeRazorStyleCliInPackage" DependsOnTargets="BuildEmbeddedRazorStyleCli">
+    <Error Condition="!Exists('..\PinguApps.RazorStyle.Cli\bin\$(Configuration)\net10.0\PinguApps.RazorStyle.Cli.dll') or !Exists('..\PinguApps.RazorStyle.Cli\bin\$(Configuration)\net11.0\PinguApps.RazorStyle.Cli.dll')"
+           Text="Build both .NET 10 and .NET 11 CLI variants before packing RazorStyle." />
     <ItemGroup>
       <TfmSpecificPackageFile Include="..\PinguApps.RazorStyle.Cli\bin\$(Configuration)\net10.0\**\*"
                               Exclude="..\PinguApps.RazorStyle.Cli\bin\$(Configuration)\net10.0\publish\**\*"
