@@ -40,14 +40,22 @@ jobs:
       - name: Restore solution
         run: dotnet restore PinguApps.RazorStyle.slnx
 
+      - name: Build both CLI runtime variants
+        run: dotnet build PinguApps.RazorStyle.slnx -c Release --no-restore
+
       - name: Run tests
         shell: pwsh
         run: |
           dotnet test PinguApps.RazorStyle.slnx `
             -c Release `
             --no-restore `
+            --no-build `
             --logger "trx;LogFilePrefix=test-results" `
             --results-directory TestResults
+
+      - name: Verify isolated package consumers
+        shell: pwsh
+        run: ./eng/Verify-Packages.ps1
 
       - name: Publish test results
         if: success() || failure()
