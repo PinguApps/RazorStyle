@@ -65,3 +65,16 @@ Scenario: Missing project context cannot silently pass checking
     When RazorStyle checks the component project
     Then the CLI exits with 2
     And the CLI reports "No C# project found"
+
+Scenario Outline: Component diagnostics work with both supported SDK hosts
+    Given a restored component project using SDK "<sdk>" targeting "<framework>"
+    When RazorStyle checks the component project
+    Then the CLI exits with 1
+    And the CLI reports "PARS0004"
+    And the CLI reports "PARS0005"
+
+    Examples:
+        | sdk       | framework |
+        | 10.0.404  | net10.0   |
+        | 11.0.100  | net10.0   |
+        | 11.0.100  | net11.0   |
