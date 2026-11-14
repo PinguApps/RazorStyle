@@ -3,8 +3,8 @@ param([string]$PackageVersion = '0.1.0-compatibility')
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
-$dotnet = (Get-Command dotnet -CommandType Application).Source
-$docker = (Get-Command docker -CommandType Application).Source
+$dotnet = (Get-Command dotnet -CommandType Application | Select-Object -First 1).Source
+$docker = (Get-Command docker -CommandType Application | Select-Object -First 1).Source
 $root = Split-Path $PSScriptRoot -Parent
 $feed = Join-Path $root 'artifacts/compatibility-packages'
 & $dotnet pack (Join-Path $root 'PinguApps.RazorStyle.slnx') -c Release --no-build "-p:PackageVersion=$PackageVersion" -o $feed
