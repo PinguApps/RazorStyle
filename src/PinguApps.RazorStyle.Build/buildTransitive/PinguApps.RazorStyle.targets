@@ -1,6 +1,11 @@
 <Project>
   <PropertyGroup>
-    <RazorStyleCliPath Condition="'$(RazorStyleCliPath)' == ''">$(MSBuildThisFileDirectory)..\tools\net10.0\PinguApps.RazorStyle.Cli.dll</RazorStyleCliPath>
+    <!-- Select by the build host, so SDK 11 can format a net10.0 project without runtime 10. -->
+    <_RazorStyleCliFramework>net10.0</_RazorStyleCliFramework>
+    <_RazorStyleCliFramework Condition="$([System.Environment]::Version.Major) &gt;= 11">net11.0</_RazorStyleCliFramework>
+    <_RazorStyleDotNetHost>dotnet</_RazorStyleDotNetHost>
+    <_RazorStyleDotNetHost Condition="'$(DOTNET_HOST_PATH)' != ''">$(DOTNET_HOST_PATH)</_RazorStyleDotNetHost>
+    <RazorStyleCliPath Condition="'$(RazorStyleCliPath)' == ''">$(MSBuildThisFileDirectory)..\tools\$(_RazorStyleCliFramework)\PinguApps.RazorStyle.Cli.dll</RazorStyleCliPath>
     <RazorStyleDisabledRuleArguments></RazorStyleDisabledRuleArguments>
     <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0001)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0001</RazorStyleDisabledRuleArguments>
     <RazorStyleDisabledRuleArguments Condition="'$(DisablePARS0002)' == 'true'">$(RazorStyleDisabledRuleArguments) --disable PARS0002</RazorStyleDisabledRuleArguments>
@@ -24,7 +29,7 @@
                        Exclude="$(MSBuildProjectDirectory)\bin\**\*;$(MSBuildProjectDirectory)\obj\**\*" />
     </ItemGroup>
 
-    <Exec Command="dotnet &quot;$(RazorStyleCliPath)&quot; $(RazorStyleCommand) &quot;$(MSBuildProjectDirectory)&quot;$(RazorStyleDisabledRuleArguments)$(RazorStyleAttributeOrderArguments)"
+    <Exec Command="&quot;$(_RazorStyleDotNetHost)&quot; &quot;$(RazorStyleCliPath)&quot; $(RazorStyleCommand) &quot;$(MSBuildProjectDirectory)&quot;$(RazorStyleDisabledRuleArguments)$(RazorStyleAttributeOrderArguments)"
           WorkingDirectory="$(MSBuildProjectDirectory)"
           Condition="'@(RazorStyleFiles)' != ''" />
   </Target>

@@ -9,17 +9,22 @@ public sealed class ComponentCliSteps : IDisposable
 {
     private readonly string _directory = Path.Combine(Path.GetTempPath(), "razorstyle-cli-" + Guid.NewGuid().ToString("N"));
     private string _arguments = string.Empty;
+    private string _cliFramework = "net10.0";
     private string _output = string.Empty;
     private int _exitCode;
 
     [Given("a restored component project for the CLI")]
-    public async Task GivenProject()
+    public Task GivenProject() => GivenProject("10.0.404", "net10.0");
+
+    [Given("a restored component project using SDK {string} targeting {string}")]
+    public async Task GivenProject(string sdk, string framework)
     {
+        _cliFramework = sdk.StartsWith("11.", StringComparison.Ordinal) ? "net11.0" : "net10.0";
         Directory.CreateDirectory(_directory);
-        await File.WriteAllTextAsync(Path.Combine(_directory, "global.json"), """{"sdk":{"version":"10.0.404","rollForward":"latestPatch"}}""");
-        await File.WriteAllTextAsync(Path.Combine(_directory, "Fixture.csproj"), """
+        await File.WriteAllTextAsync(Path.Combine(_directory, "global.json"), $$$"""{"sdk":{"version":"{{{sdk}}}","rollForward":"latestPatch"}}""");
+        await File.WriteAllTextAsync(Path.Combine(_directory, "Fixture.csproj"), $$"""
             <Project Sdk="Microsoft.NET.Sdk.Razor">
-              <PropertyGroup><TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable></PropertyGroup>
+              <PropertyGroup><TargetFramework>{{framework}}</TargetFramework><Nullable>enable</Nullable></PropertyGroup>
               <ItemGroup><FrameworkReference Include="Microsoft.AspNetCore.App" /></ItemGroup>
             </Project>
             """);
@@ -87,7 +92,7 @@ public sealed class ComponentCliSteps : IDisposable
         }
         Assert.NotNull(root);
         string configuration = new DirectoryInfo(AppContext.BaseDirectory).Parent!.Name;
-        string cli = Path.Combine(root.FullName, "src", "PinguApps.RazorStyle.Cli", "bin", configuration, "net10.0", "PinguApps.RazorStyle.Cli.dll");
+        string cli = Path.Combine(root.FullName, "src", "PinguApps.RazorStyle.Cli", "bin", configuration, _cliFramework, "PinguApps.RazorStyle.Cli.dll");
         List<string> arguments = [cli, "check", _directory];
         arguments.AddRange(_arguments.Split(' ', StringSplitOptions.RemoveEmptyEntries));
         (_exitCode, _output) = await RunAsync(arguments);

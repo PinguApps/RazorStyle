@@ -27,6 +27,8 @@ RazorStyle is distributed in two forms:
 - [`PinguApps.RazorStyle`](https://www.nuget.org/packages/PinguApps.RazorStyle/) is the NuGet build integration package. Use this when you want RazorStyle to run automatically as part of project builds. It is the best fit for shared enforcement because every developer and CI agent gets the same behaviour through `PackageReference`. By default, local builds fix files and CI builds check files when `ContinuousIntegrationBuild=true`. You can control whether it runs, whether it checks or fixes, and which rules are disabled through MSBuild properties.
 - [`PinguApps.RazorStyle.Cli`](https://www.nuget.org/packages/PinguApps.RazorStyle.Cli/) is a .NET tool named `razorstyle`. Use this when you want an explicit command for local formatting, repository-wide checks, scripts, or CI jobs that should not depend on MSBuild. It is useful for one-off cleanup, pre-commit workflows, and direct control over the target path and disabled rules.
 
+Both packages contain .NET 10 and .NET 11 CLI builds under the same package ID and version. Tool installation selects a compatible target framework; `--framework net10.0` or `--framework net11.0` can select one explicitly. The build integration chooses by the running MSBuild host: SDK 10 uses the net10.0 CLI, and SDK 11 uses the net11.0 CLI even when the application targets net10.0. Compiler analyzers remain netstandard2.0.
+
 ## Build Integration
 
 Install the build package into a project that contains `.razor` files:

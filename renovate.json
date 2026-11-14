@@ -13,6 +13,26 @@
         "dotnet-sdk"
       ],
       "allowedVersions": "<11"
+    },
+    {
+      "description": "Keep the .NET 10 CLI compile references on the verified MSBuild 18.9 compatibility line; the .NET 11 variant updates independently.",
+      "matchPackageNames": [
+        "Microsoft.Build",
+        "Microsoft.Build.Framework",
+        "Microsoft.NET.StringTools"
+      ],
+      "matchCurrentVersion": "/^18\\.9\\./",
+      "allowedVersions": "/^18\\.9\\./"
+    },
+    {
+      "description": "Keep .NET 10 tools and netstandard2.0 compiler analyzers on the verified Roslyn 5.9 line; the .NET 11 workspace updates independently.",
+      "matchPackageNames": [
+        "Microsoft.CodeAnalysis.CSharp",
+        "Microsoft.CodeAnalysis.CSharp.Workspaces",
+        "Microsoft.CodeAnalysis.Workspaces.MSBuild"
+      ],
+      "matchCurrentVersion": "/^5\\.9\\./",
+      "allowedVersions": "/^5\\.9\\./"
     }
   ]
 }
